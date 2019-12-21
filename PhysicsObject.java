@@ -1,6 +1,9 @@
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
+import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 import javax.swing.*;
 
 public class PhysicsObject extends JPanel {
@@ -16,11 +19,13 @@ public class PhysicsObject extends JPanel {
 	private double fallingTime;	//How long the object has BEEN falling (for very not real gravitational acceleration)
 
 	private Color color;
+	
+	private Image img;
 
 	int objectW = 20;	//Object dimensions
 	int objectH = 20;
 
-	public PhysicsObject(int x, int y, Color color) {    	
+	public PhysicsObject(String file, int x, int y, Color color) {
 		this.lastX = x;
 		this.lastY = y;
 
@@ -33,6 +38,11 @@ public class PhysicsObject extends JPanel {
 		this.fallingTime = 1;
 
 		this.color = color;
+		
+		try {
+			this.img = ImageIO.read(new File("file"));
+			img = img.getScaledInstance(objectW, objectH, Image.SCALE_SMOOTH);
+		} catch(IOException e) {}
 	}
 
 	public void draw(Graphics g) {	//The object's own draw method (this is what whiteboard from the physics class calls to draw onto panel)
@@ -82,8 +92,10 @@ public class PhysicsObject extends JPanel {
 			if(!objectCollision(lastX + 2, lastY)) lastX += moveSpeed;
 		}
 
-		gg.setColor(color);	//Object colour and dimensions
-		gg.fillRect(lastX, lastY, objectW, objectH);	//(top left corner coordinates, how far left *X value* and down *Y* it goes)
+		//gg.setColor(color);	//Object colour and dimensions
+		//gg.fillRect(lastX, lastY, objectW, objectH);	//(top left corner coordinates, how far left *X value* and down *Y* it goes)
+		
+        gg.drawImage(img, lastX, lastY, null);
 	}
 
 	public void moveX(double dx) {	//Increase moveSpeed, which is how much the object moves with each refresh (0 means not moving)
