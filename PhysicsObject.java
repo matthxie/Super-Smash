@@ -5,9 +5,11 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 
 public class PhysicsObject extends JPanel {
+	private Weapon weapon;
+	
 	private int objectW;	//Object dimensions
 	private int objectH;
-	
+
 	private int lastX;	//Current X value
 	private int lastY;	//Current Y value
 
@@ -16,17 +18,21 @@ public class PhysicsObject extends JPanel {
 
 	private boolean falling;	//Whether the object IS falling
 	private boolean friction; 	//Whether is object should be rubbing
-
+	
 	private double fallingTime;	//How long the object has BEEN falling (for very not real gravitational acceleration)
 	
+	private boolean swinging;
+
 	private Image img;
 
-	public PhysicsObject(String file, int x, int y, int width, int height) {
+	public PhysicsObject(String file, String weaponName, int x, int y, int width, int height) {		
 		this.objectW = width;
 		this.objectH = height;
-		
+
 		this.lastX = x;
 		this.lastY = y;
+		
+		this.weapon = new Weapon(weaponName, lastX-(objectW/2), lastY+(objectH/2), 40, 40, 2, 20, 10);
 
 		this.fallSpeed = -10;
 		this.moveSpeed = 0;
@@ -36,14 +42,15 @@ public class PhysicsObject extends JPanel {
 
 		this.fallingTime = 1;
 		
-		try {
-			this.img = ImageIO.read(new File(file));
-			img = img.getScaledInstance(objectW, objectH, Image.SCALE_SMOOTH);
+		this.swinging = false;
+		
+		try { this.img = ImageIO.read(new File(file));
+		img = img.getScaledInstance(objectW, objectH, Image.SCALE_SMOOTH); 
 		} catch(IOException e) {}
 	}
 
 	public void draw(Graphics g) {	//The object's own draw method (this is what whiteboard from the physics class calls to draw onto panel)
-		Graphics2D gg = (Graphics2D) g;	//This is some next level stuff all I know is that changing gg's stuff pisses Java off
+		Graphics2D gg = (Graphics2D) g;
 
 		//Make the object fall
 		if(falling && !platformCollision() && !objectCollision(lastX, lastY)) {
@@ -72,27 +79,24 @@ public class PhysicsObject extends JPanel {
 		if(falling) lastY += fallSpeed * fallingTime;	//fallingTime is a modifier
 
 		//Move if not at left or right boundaries
-		if(lastX + moveSpeed > 0 && lastX + moveSpeed < Physics.width-18 - objectW && !objectCollision(lastX, lastY)) {
+		if(lastX + moveSpeed > 0 && lastX + moveSpeed < Physics.width-18 - objectW && !objectCollision(lastX+moveSpeed, lastY)) {
 			if(!friction) lastX += moveSpeed;	//Move if there is no friction
 			else {
-				if(moveSpeed > 0 && !falling) moveSpeed -= 0.2;	//Increase or decrease moveSpeed until it's 0
-				else if(moveSpeed > 0) moveSpeed -= 0.05;	//This line basically makes sure the object's lateral speed still exists in midair
+				if(moveSpeed > 0 && !falling) moveSpeed -= 0.4;	//Increase or decrease moveSpeed until it's 0
+				else if(moveSpeed > 0) moveSpeed -= 0.1;	//This line basically makes sure the object's lateral speed still exists in midair
 
-				if(moveSpeed < 0 && !falling) moveSpeed += 0.2;
-				else if(moveSpeed < 0) moveSpeed += 0.05;
+				if(moveSpeed < 0 && !falling) moveSpeed += 0.4;
+				else if(moveSpeed < 0) moveSpeed += 0.1;
 
 				if(moveSpeed != 0) lastX += moveSpeed;	//Move the object until the moveSpeed becomes 0
 				if(moveSpeed == 0) friction = false;
 			}
 		}
-		else if(lastX + moveSpeed > 0 && lastX + moveSpeed < Physics.width-18 - objectW && objectCollision(lastX, lastY)) {
-			if(!objectCollision(lastX + 2, lastY)) lastX += moveSpeed;
-		}
 
-		//gg.setColor(color);	//Object colour and dimensions
-		//gg.fillRect(lastX, lastY, objectW, objectH);	//(top left corner coordinates, how far left *X value* and down *Y* it goes)
+		weapon.setX(lastX-objectW);
+		weapon.setY(lastY+(objectH/2));
 		
-        gg.drawImage(img, lastX, lastY, null);
+		gg.drawImage(img, lastX, lastY, null);
 	}
 
 	public void moveX(double dx) {	//Increase moveSpeed, which is how much the object moves with each refresh (0 means not moving)
@@ -115,18 +119,8 @@ public class PhysicsObject extends JPanel {
 			if(Physics.physicsObjectList.get(i) != this) {
 				PhysicsObject temp = Physics.physicsObjectList.get(i);
 				if((lastY <= temp.lastY + temp.objectH && lastY >= temp.lastY)||(lastY + objectH <= temp.lastY + temp.objectH && lastY+ objectH >= temp.lastY))
-					if((lastX >= temp.lastX && lastX <= temp.lastX + temp.objectW) ||(lastX + objectW >= temp.lastX && lastX + objectW <= temp.lastX + temp.objectW)) {
-						if(moveSpeed != 0 || temp.moveSpeed != 0) {	//Bounce each object off each other by pushing each back
-							lastX += moveSpeed+temp.moveSpeed / -40;
-							moveSpeed = moveSpeed+temp.moveSpeed / -2;
-							friction = true;
-							
-							temp.lastX += moveSpeed+temp.moveSpeed / -40;
-							temp.moveSpeed = moveSpeed+temp.moveSpeed / -2;
-							temp.friction = true;
-						}
+					if((lastX >= temp.lastX && lastX <= temp.lastX + temp.objectW) ||(lastX + objectW >= temp.lastX && lastX + objectW <= temp.lastX + temp.objectW))
 						return true;
-					}
 			}
 		}
 		return false;
@@ -141,11 +135,19 @@ public class PhysicsObject extends JPanel {
 		}
 		return false;
 	}
+
+	public Weapon getweapon() {
+		return weapon;
+	}
+	
+	public void swingWeapon() {
+		swinging = true;
+	}
 	
 	public boolean fallingStatus() {
 		return falling;
 	}
-	
+
 	public void setFallSpeed(double speed) {
 		fallSpeed = speed;
 	}
