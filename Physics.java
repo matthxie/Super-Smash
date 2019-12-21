@@ -10,34 +10,34 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 
 	//Put any and all objects you create into an ArrayList, the whiteboard method will draw their contents onto the panel
 	//Might have to make a new object class containing non physics stuff and use the AnyOtherObject ArrayList for platforms and decorations
-	public static ArrayList<PhysicsObject> physicsObjectList = new ArrayList<PhysicsObject>();	//All the physics objects
-	//public static Arraylist<AnyOtherObject> normalObjectList = new Arraylist<AnyOtherObject>(); //All the non physics objects
-	
-	//Image backgroundImage = Toolkit.getDefaultToolkit().createImage("better.jpg").getScaledInstance(width, height,java.awt.Image.SCALE_SMOOTH);
-	
-	public static ArrayList<Platform> platformList = new ArrayList<Platform>();
+	public static ArrayList<PhysicsObject> physicsObjectList = new ArrayList<PhysicsObject>();	//All physics objects	
+	public static ArrayList<Platform> platformList = new ArrayList<Platform>();	//All platform objects
+	public static ArrayList<Weapon> weaponList = new ArrayList<Weapon>();	//All weapon objects
 	
 	JFrame frame;
 	JPanel panel = new whiteboard();	//whiteboard is a method which creates a panel that you can "draw" objects onto
 
 	public Physics() {
-		frame = new JFrame("Gravity???????");	//Frame stuff
+		frame = new JFrame("Super Smash");	//Frame stuff
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(width, height);
 		frame.addKeyListener(this);		
 		
 		panel.setLayout(new BorderLayout());	
+				
+		physicsObjectList.add(new PhysicsObject("yoshi.png", "sword.png", ThreadLocalRandom.current().nextInt(100, 300 + 1), 100, 30, 40));	//Adds the two blocks ArrayList
+		physicsObjectList.add(new PhysicsObject("yoshi.png", "sword.png", ThreadLocalRandom.current().nextInt(550, 750 + 1), 100, 30, 40));
 		
-		physicsObjectList.add(new PhysicsObject("yoshi.png", ThreadLocalRandom.current().nextInt(100, 550 + 1), 100, 30, 40));	//Adds the two blocks ArrayList
-		physicsObjectList.add(new PhysicsObject("yoshi.png", ThreadLocalRandom.current().nextInt(100, 550 + 1), 100, 30, 40));
 		platformList.add(new Platform(400, 92 ,101, 5));
 		platformList.add(new Platform(280, 170 ,102, 5));
 		platformList.add(new Platform(519, 170 ,102, 5));
-
 		platformList.add(new Platform(400, 245 ,101, 5));
 		platformList.add(new Platform(158, 245 ,107, 5));
 		platformList.add(new Platform(637, 245 ,105, 5));
 		platformList.add(new Platform(90, 315 ,710, 15));
+		
+		for(int i=0; i<physicsObjectList.size(); i++) 
+			weaponList.add(physicsObjectList.get(i).getweapon());
 
 		frame.add(panel);
 
@@ -66,6 +66,9 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 		if(e.getKeyCode() == KeyEvent.VK_UP) {
 			if(!physicsObjectList.get(0).fallingStatus()) physicsObjectList.get(0).moveY(-10);	//Negative Y moves up
 		}
+		
+		if(e.getKeyCode() == KeyEvent.VK_COMMA) 
+			physicsObjectList.get(0).swingWeapon();
 
 		//WASD for object2
 		if(e.getKeyCode() == KeyEvent.VK_D) physicsObjectList.get(1).moveX(4);	//"VK_*LETTER*" --> "D" key
@@ -74,6 +77,9 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 		if(e.getKeyCode() == KeyEvent.VK_W) {
 			if(!physicsObjectList.get(1).fallingStatus()) physicsObjectList.get(1).moveY(-10);
 		}
+		
+		if(e.getKeyCode() == KeyEvent.VK_X) 
+			physicsObjectList.get(1).swingWeapon();
 	}
 
 	public void keyReleased(KeyEvent e) {	//When the keys are released
@@ -91,10 +97,12 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 
 			for(int i=0; i<physicsObjectList.size(); i++) //Draws all the obejcts from physicsObjectList
 				physicsObjectList.get(i).draw(g);
+			
 			for(int i=0; i<platformList.size(); i++) //Draws all the obejcts from physicsObjectList
 				platformList.get(i).draw(g);
-			//for(int j=0; j<normalObjectList.size(); j++)	//Draw contents in normalObjectList
-			//	normalObjectList.get(j).draw(g);
+			
+			for(int j=0; j<weaponList.size(); j++)	//Draw contents in weaponList
+				weaponList.get(j).draw(g);
 		}
 	}
 	
