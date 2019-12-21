@@ -6,7 +6,7 @@ import javax.swing.*;
 
 public class PhysicsObject extends JPanel {
 	private Weapon weapon;
-	
+
 	private int objectW;	//Object dimensions
 	private int objectH;
 
@@ -18,10 +18,11 @@ public class PhysicsObject extends JPanel {
 
 	private boolean falling;	//Whether the object IS falling
 	private boolean friction; 	//Whether is object should be rubbing
-	
+
 	private double fallingTime;	//How long the object has BEEN falling (for very not real gravitational acceleration)
-	
-	private boolean swinging;
+
+	private boolean swingWeapon;
+	private boolean swingDown;
 
 	private Image img;
 
@@ -31,7 +32,7 @@ public class PhysicsObject extends JPanel {
 
 		this.lastX = x;
 		this.lastY = y;
-		
+
 		this.weapon = new Weapon(weaponName, lastX-(objectW/2), lastY+(objectH/2), 40, 40, 2, 20, 10);
 
 		this.fallSpeed = -10;
@@ -41,9 +42,10 @@ public class PhysicsObject extends JPanel {
 		this.friction = false;
 
 		this.fallingTime = 1;
-		
-		this.swinging = false;
-		
+
+		this.swingWeapon = false;
+		this.swingDown = true;
+
 		try { this.img = ImageIO.read(new File(file));
 		img = img.getScaledInstance(objectW, objectH, Image.SCALE_SMOOTH); 
 		} catch(IOException e) {}
@@ -93,9 +95,18 @@ public class PhysicsObject extends JPanel {
 			}
 		}
 
+		if(swingWeapon) {
+			if(swingDown && weapon.swingDown()) swingDown = false;
+			if(!swingDown)
+				if(weapon.swingUp()) {
+					swingWeapon = false;
+					swingDown = true;
+				}
+		}
+
 		weapon.setX(lastX-objectW);
 		weapon.setY(lastY+(objectH/2));
-		
+
 		gg.drawImage(img, lastX, lastY, null);
 	}
 
@@ -139,11 +150,11 @@ public class PhysicsObject extends JPanel {
 	public Weapon getweapon() {
 		return weapon;
 	}
-	
+
 	public void swingWeapon() {
-		swinging = true;
+		swingWeapon = true;
 	}
-	
+
 	public boolean fallingStatus() {
 		return falling;
 	}
