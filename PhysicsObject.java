@@ -116,9 +116,9 @@ public class PhysicsObject extends JPanel {
 				PhysicsObject temp = Physics.physicsObjectList.get(i);
 				if((lastY <= temp.lastY + temp.objectH && lastY >= temp.lastY)||(lastY + objectH <= temp.lastY + temp.objectH && lastY+ objectH >= temp.lastY))
 					if((lastX >= temp.lastX && lastX <= temp.lastX + temp.objectW) ||(lastX + objectW >= temp.lastX && lastX + objectW <= temp.lastX + temp.objectW)) {
-						if(moveSpeed != 0 || temp.getMoveSpeed() != 0) {	//Bounce each object off each other by pushing each back
-							lastX += moveSpeed+temp.getMoveSpeed() / -40;
-							moveSpeed = moveSpeed+temp.getMoveSpeed() / -2;
+						if(moveSpeed != 0 || temp.moveSpeed != 0) {	//Bounce each object off each other by pushing each back
+							lastX += moveSpeed+temp.moveSpeed / -40;
+							moveSpeed = moveSpeed+temp.moveSpeed / -2;
 							friction = true;
 							
 							temp.lastX += moveSpeed+temp.moveSpeed / -40;
@@ -141,35 +141,11 @@ public class PhysicsObject extends JPanel {
 		}
 		return false;
 	}
-
-	public boolean fallingStatus() {	//Check if object is falling
+	
+	public boolean fallingStatus() {
 		return falling;
 	}
-
-	public int getLastX() {	//Get current X value
-		return lastX;
-	}
-
-	public int getLastY() {	//Get current Y
-		return lastY;
-	}
-
-	public int getObjectW() {	//Get object width
-		return objectW;
-	}
-
-	public int getObjectH() {	//Get object height (of the rectangle, not how far it is off the ground)
-		return objectH;
-	}
-
-	public double getFallSpeed() {
-		return fallSpeed;
-	}
-
-	public double getMoveSpeed() {
-		return moveSpeed;
-	}
-
+	
 	public void setFallSpeed(double speed) {
 		fallSpeed = speed;
 	}
