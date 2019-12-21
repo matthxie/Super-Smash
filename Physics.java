@@ -13,10 +13,7 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 	public static ArrayList<PhysicsObject> physicsObjectList = new ArrayList<PhysicsObject>();	//All the physics objects
 	//public static Arraylist<AnyOtherObject> normalObjectList = new Arraylist<AnyOtherObject>(); //All the non physics objects
 	
-	
-	Image backgroundImage = Toolkit.getDefaultToolkit().createImage("better.jpg").getScaledInstance(width, height,java.awt.Image.SCALE_SMOOTH);
-	
-	
+	//Image backgroundImage = Toolkit.getDefaultToolkit().createImage("better.jpg").getScaledInstance(width, height,java.awt.Image.SCALE_SMOOTH);
 	
 	public static ArrayList<Platform> platformList = new ArrayList<Platform>();
 	
@@ -31,8 +28,8 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 		
 		panel.setLayout(new BorderLayout());	
 		
-		physicsObjectList.add(new PhysicsObject(ThreadLocalRandom.current().nextInt(100, 550 + 1), 100, Color.red));	//Adds the two blocks ArrayList
-		physicsObjectList.add(new PhysicsObject(ThreadLocalRandom.current().nextInt(100, 550 + 1), 100, Color.blue));
+		physicsObjectList.add(new PhysicsObject("yoshi.png", ThreadLocalRandom.current().nextInt(100, 550 + 1), 100, 30, 40));	//Adds the two blocks ArrayList
+		physicsObjectList.add(new PhysicsObject("yoshi.png", ThreadLocalRandom.current().nextInt(100, 550 + 1), 100, 30, 40));
 		platformList.add(new Platform(400, 92 ,101, 5));
 		platformList.add(new Platform(280, 170 ,102, 5));
 		platformList.add(new Platform(519, 170 ,102, 5));
@@ -52,7 +49,7 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 				while (true) {	
 					frame.repaint();	//Refresh frame and panel
 					panel.repaint();
-					try {Thread.sleep(17);} catch (Exception ex) {}	//10 millisecond delay between each refresh
+					try {Thread.sleep(12);} catch (Exception ex) {}	//10 millisecond delay between each refresh
 				}
 			}
 		});	
@@ -67,7 +64,7 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 		else if(e.getKeyCode() == KeyEvent.VK_LEFT) physicsObjectList.get(0).moveX(-4);	//Get the first object from physicsObjectList, positive X moves right
 
 		if(e.getKeyCode() == KeyEvent.VK_UP) {
-			if(!physicsObjectList.get(0).fallingStatus()) physicsObjectList.get(0).moveY(-12);	//Negative Y moves up
+			if(!physicsObjectList.get(0).fallingStatus()) physicsObjectList.get(0).moveY(-10);	//Negative Y moves up
 		}
 
 		//WASD for object2
@@ -75,7 +72,7 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 		else if(e.getKeyCode() == KeyEvent.VK_A) physicsObjectList.get(1).moveX(-4);	//physicsObjectList.get(1): gets second obejct (the only two are the boxes)
 
 		if(e.getKeyCode() == KeyEvent.VK_W) {
-			if(!physicsObjectList.get(1).fallingStatus()) physicsObjectList.get(1).moveY(-12);
+			if(!physicsObjectList.get(1).fallingStatus()) physicsObjectList.get(1).moveY(-10);
 		}
 	}
 
@@ -90,12 +87,12 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 	public class whiteboard extends JPanel {	//Make a new JPanel that you can draw objects onto (Can't draw stuff anywhere you want onto normal JPanels)
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);	//Call paintComponent from the overlord JPanel
-			g.drawImage(backgroundImage, 0, 0, null);
+			//g.drawImage(backgroundImage, 0, 0, null);
 
 			for(int i=0; i<physicsObjectList.size(); i++) //Draws all the obejcts from physicsObjectList
 				physicsObjectList.get(i).draw(g);
-//			for(int i=0; i<platformList.size(); i++) //Draws all the obejcts from physicsObjectList
-//				platformList.get(i).draw(g);
+			for(int i=0; i<platformList.size(); i++) //Draws all the obejcts from physicsObjectList
+				platformList.get(i).draw(g);
 			//for(int j=0; j<normalObjectList.size(); j++)	//Draw contents in normalObjectList
 			//	normalObjectList.get(j).draw(g);
 		}
@@ -105,5 +102,3 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 		new Physics();
 	}
 }
-
-
