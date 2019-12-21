@@ -31,7 +31,7 @@ public class Weapon {
 		this.weaponW = width;
 		this.weaponH = height;
 		
-		this.angle = 50;
+		this.angle = 90;
 
 		this.speed = speed;
 		this.damage = damage; 
@@ -59,15 +59,13 @@ public class Weapon {
 	}
 	
 	public boolean swingDown() {
-		System.out.println("down");
-		angle--;
-		if(angle == 45) return true;
+		angle-=2;
+		if(angle == 36) return true;
 		return false;
 	}
 	
 	public boolean swingUp() {
-		System.out.println("up");
-		angle++;
+		angle+=2;
 		if(angle == 90) return true;
 		return false;
 	}
