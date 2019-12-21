@@ -1,12 +1,13 @@
 import java.awt.*;
-import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
 public class PhysicsObject extends JPanel {
+	private int objectW;	//Object dimensions
+	private int objectH;
+	
 	private int lastX;	//Current X value
 	private int lastY;	//Current Y value
 
@@ -17,15 +18,13 @@ public class PhysicsObject extends JPanel {
 	private boolean friction; 	//Whether is object should be rubbing
 
 	private double fallingTime;	//How long the object has BEEN falling (for very not real gravitational acceleration)
-
-	private Color color;
 	
 	private Image img;
 
-	int objectW = 20;	//Object dimensions
-	int objectH = 20;
-
-	public PhysicsObject(String file, int x, int y, Color color) {
+	public PhysicsObject(String file, int x, int y, int width, int height) {
+		this.objectW = width;
+		this.objectH = height;
+		
 		this.lastX = x;
 		this.lastY = y;
 
@@ -36,11 +35,9 @@ public class PhysicsObject extends JPanel {
 		this.friction = false;
 
 		this.fallingTime = 1;
-
-		this.color = color;
 		
 		try {
-			this.img = ImageIO.read(new File("file"));
+			this.img = ImageIO.read(new File(file));
 			img = img.getScaledInstance(objectW, objectH, Image.SCALE_SMOOTH);
 		} catch(IOException e) {}
 	}
@@ -124,8 +121,8 @@ public class PhysicsObject extends JPanel {
 							moveSpeed = moveSpeed+temp.getMoveSpeed() / -2;
 							friction = true;
 							
-							temp.lastX += moveSpeed+temp.getMoveSpeed() / -40;
-							temp.moveSpeed = moveSpeed+temp.getMoveSpeed() / -2;
+							temp.lastX += moveSpeed+temp.moveSpeed / -40;
+							temp.moveSpeed = moveSpeed+temp.moveSpeed / -2;
 							temp.friction = true;
 						}
 						return true;
