@@ -130,8 +130,14 @@ public class PhysicsObject extends JPanel {
 			if(Physics.physicsObjectList.get(i) != this) {
 				PhysicsObject temp = Physics.physicsObjectList.get(i);
 				if((lastY <= temp.lastY + temp.objectH && lastY >= temp.lastY)||(lastY + objectH <= temp.lastY + temp.objectH && lastY+ objectH >= temp.lastY))
-					if((lastX >= temp.lastX && lastX <= temp.lastX + temp.objectW) ||(lastX + objectW >= temp.lastX && lastX + objectW <= temp.lastX + temp.objectW))
+					if((lastX >= temp.lastX && lastX <= temp.lastX + temp.objectW) ||(lastX + objectW >= temp.lastX && lastX + objectW <= temp.lastX + temp.objectW)) {
+						if(temp.falling) {
+							if(temp.lastX+temp.objectW > lastX+objectW) temp.lastX += objectW;
+							else temp.lastX -= objectW;
+							temp.falling = true;
+						}
 						return true;
+					}			
 			}
 		}
 		return false;
