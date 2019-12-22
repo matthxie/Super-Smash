@@ -1,4 +1,5 @@
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
@@ -23,6 +24,8 @@ public class PhysicsObject extends JPanel {
 
 	private boolean swingWeapon;
 	private boolean swingDown;
+	
+	private int leftOrientation;
 
 	private Image img;
 
@@ -45,6 +48,8 @@ public class PhysicsObject extends JPanel {
 
 		this.swingWeapon = false;
 		this.swingDown = true;
+		
+		this.leftOrientation = -1;
 
 		try { this.img = ImageIO.read(new File(file));
 		img = img.getScaledInstance(objectW, objectH, Image.SCALE_SMOOTH); 
@@ -114,6 +119,10 @@ public class PhysicsObject extends JPanel {
 		if(dx != 0) {
 			friction = false;	//No friction while user is pressing the move key
 			moveSpeed = dx;
+			if(dx<0 && leftOrientation>0 || dx>0 && leftOrientation<0) {
+				img = flip(toBufferedImage(img), true);
+				weapon.setImg(flip(toBufferedImage(weapon.getImg()), false));
+			}
 		}
 		else friction = true;	//Friction comes in after the user releases the move key
 	}
@@ -131,7 +140,7 @@ public class PhysicsObject extends JPanel {
 				PhysicsObject temp = Physics.physicsObjectList.get(i);
 				if((lastY <= temp.lastY + temp.objectH && lastY >= temp.lastY)||(lastY + objectH <= temp.lastY + temp.objectH && lastY+ objectH >= temp.lastY))
 					if((lastX >= temp.lastX && lastX <= temp.lastX + temp.objectW) ||(lastX + objectW >= temp.lastX && lastX + objectW <= temp.lastX + temp.objectW)) {
-						if(temp.falling) {
+						if(temp.falling) {	//If other player lands on top this player, slide the other player off to the side
 							if(temp.lastX+temp.objectW > lastX+objectW) temp.lastX += objectW;
 							else temp.lastX -= objectW;
 							temp.falling = true;
@@ -151,6 +160,26 @@ public class PhysicsObject extends JPanel {
 					return true;
 		}
 		return false;
+	}
+
+	Image flip(BufferedImage sprite, boolean player) {
+		if(player) leftOrientation *= -1;
+		BufferedImage img = new BufferedImage(sprite.getWidth(), sprite.getHeight(), BufferedImage.TYPE_INT_ARGB);
+		for(int i = sprite.getWidth()-1; i>0; i--) 
+			for(int j=0; j<sprite.getHeight(); j++)
+				img.setRGB(sprite.getWidth()-i, j, sprite.getRGB(i, j));
+		return img;
+	}
+
+	public BufferedImage toBufferedImage(Image img) {
+		if(img instanceof BufferedImage) return (BufferedImage) img;
+
+		BufferedImage temp = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+		Graphics2D graphics = temp.createGraphics();
+		graphics.drawImage(img, 0, 0, null);
+		graphics.dispose();
+
+		return temp;
 	}
 
 	public Weapon getweapon() {
