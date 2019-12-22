@@ -24,12 +24,15 @@ public class PhysicsObject extends JPanel {
 
 	private boolean swingWeapon;
 	private boolean swingDown;
-	
+
 	private int leftOrientation;
+
+	private double damagePercentage;
+	private PhysicsObject hitObject;
 
 	private Image img;
 
-	public PhysicsObject(String file, String weaponName, int x, int y, int width, int height) {		
+	public PhysicsObject(String file, String weaponName, int x, int y, int width, int height) {
 		this.objectW = width;
 		this.objectH = height;
 
@@ -48,8 +51,10 @@ public class PhysicsObject extends JPanel {
 
 		this.swingWeapon = false;
 		this.swingDown = true;
-		
+
 		this.leftOrientation = -1;
+
+		this.damagePercentage = 1;
 
 		try { this.img = ImageIO.read(new File(file));
 		img = img.getScaledInstance(objectW, objectH, Image.SCALE_SMOOTH); 
@@ -60,7 +65,7 @@ public class PhysicsObject extends JPanel {
 		Graphics2D gg = (Graphics2D) g;
 
 		//Make the object fall
-		if(falling && !platformCollision() && !objectCollision(lastX, lastY)) {
+		if(falling && !platformCollision() && !objectCollision(lastX, lastY, false)) {
 			if(fallSpeed < 0) fallSpeed += 0.5;	//Slow down upward speed until it becomes 0
 			else {
 				fallSpeed = 2;	//After the object starts falling, its speed is modified by multiplying fallSpeed with fallingTime (acceleration) 
@@ -69,16 +74,12 @@ public class PhysicsObject extends JPanel {
 		}
 
 		//Check to see if object should fall
-		if(lastY > (Physics.height-50 - objectH) || platformCollision() || objectCollision(lastX, lastY)) {	//Check if object is at a certain height (for ground)
+		if(platformCollision() || objectCollision(lastX, lastY, false)) {	//Check if object is at a certain height (for ground)
 			if(fallSpeed > 0) {
 				falling = false;	//Stop falling if on ground
 				fallingTime = 1;	//Reset the fallingTime (has to be always at least 1, otherwise would start at a lower falling speed)
 			}
 			else falling = true;
-		}
-		else if(lastY <= 0) {
-			fallSpeed = 0.5;
-			falling = true;
 		}
 		else falling = true;	//Fall if not on ground
 
@@ -86,14 +87,14 @@ public class PhysicsObject extends JPanel {
 		if(falling) lastY += fallSpeed * fallingTime;	//fallingTime is a modifier
 
 		//Move if not at left or right boundaries
-		if(lastX + moveSpeed > 0 && lastX + moveSpeed < Physics.width-18 - objectW && !objectCollision(lastX+moveSpeed, lastY)) {
+		if(!objectCollision(lastX+moveSpeed, lastY, false)) {
 			if(!friction) lastX += moveSpeed;	//Move if there is no friction
 			else {
-				if(moveSpeed > 0 && !falling) moveSpeed -= 0.4;	//Increase or decrease moveSpeed until it's 0
-				else if(moveSpeed > 0) moveSpeed -= 0.1;	//This line basically makes sure the object's lateral speed still exists in midair
+				if(moveSpeed > 0 && !falling) moveSpeed -= 0.8;	//Increase or decrease moveSpeed until it's 0
+				else if(moveSpeed > 0) moveSpeed -= 0.4;	//This line basically makes sure the object's lateral speed still exists in midair
 
-				if(moveSpeed < 0 && !falling) moveSpeed += 0.4;
-				else if(moveSpeed < 0) moveSpeed += 0.1;
+				if(moveSpeed < 0 && !falling) moveSpeed += 0.8;
+				else if(moveSpeed < 0) moveSpeed += 0.4;
 
 				if(moveSpeed != 0) lastX += moveSpeed;	//Move the object until the moveSpeed becomes 0
 				if(moveSpeed == 0) friction = false;
@@ -101,12 +102,18 @@ public class PhysicsObject extends JPanel {
 		}
 
 		if(swingWeapon) {
+			if(swingDown && objectCollision(lastX+11, lastY, true) && leftOrientation > 0)
+				hitObject.moveSpeed += 1*hitObject.damagePercentage;
+			else if(objectCollision(lastX-11, lastY, true) && leftOrientation < 0)
+				hitObject.moveSpeed -= 1*hitObject.damagePercentage;
+			
 			if(swingDown && weapon.swingDown()) swingDown = false;
-			if(!swingDown)
+			if(!swingDown) {
 				if(weapon.swingUp()) {
 					swingWeapon = false;
 					swingDown = true;
 				}
+			}
 		}
 
 		weapon.setX(lastX-objectW);
@@ -134,7 +141,7 @@ public class PhysicsObject extends JPanel {
 		}
 	}
 
-	public boolean objectCollision(double lastX, double lastY) {	//Check if there's a collision (and bounce both objects based on their average of their moveSpeeds)
+	public boolean objectCollision(double lastX, double lastY, boolean hit) {	//Check if there's a collision
 		for(int i=0; i<Physics.physicsObjectList.size(); i++) {
 			if(Physics.physicsObjectList.get(i) != this) {
 				PhysicsObject temp = Physics.physicsObjectList.get(i);
@@ -145,6 +152,7 @@ public class PhysicsObject extends JPanel {
 							else temp.lastX -= objectW;
 							temp.falling = true;
 						}
+						if(hit) hitObject = temp;
 						return true;
 					}			
 			}
