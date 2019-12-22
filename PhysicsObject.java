@@ -25,7 +25,7 @@ public class PhysicsObject extends JPanel {
 	private boolean swingWeapon;
 	private boolean swingDown;
 
-	private int leftOrientation;
+	private int rightOrientation;
 
 	private double damagePercentage;
 	private PhysicsObject hitObject;
@@ -39,7 +39,7 @@ public class PhysicsObject extends JPanel {
 		this.lastX = x;
 		this.lastY = y;
 
-		this.weapon = new Weapon(weaponName, lastX-(objectW/2), lastY+(objectH/2), 40, 40, 2, 20, 10);
+		this.weapon = new Weapon(weaponName, lastX-(objectW/2), lastY+(objectH/2), 40, 40, 2, 0.2, 10);
 
 		this.fallSpeed = -10;
 		this.moveSpeed = 0;
@@ -52,7 +52,7 @@ public class PhysicsObject extends JPanel {
 		this.swingWeapon = false;
 		this.swingDown = true;
 
-		this.leftOrientation = -1;
+		this.rightOrientation = -1;
 
 		this.damagePercentage = 1;
 
@@ -63,7 +63,7 @@ public class PhysicsObject extends JPanel {
 
 	public void draw(Graphics g) {	//The object's own draw method (this is what whiteboard from the physics class calls to draw onto panel)
 		Graphics2D gg = (Graphics2D) g;
-
+		
 		//Make the object fall
 		if(falling && !platformCollision() && !objectCollision(lastX, lastY, false)) {
 			if(fallSpeed < 0) fallSpeed += 0.5;	//Slow down upward speed until it becomes 0
@@ -101,11 +101,16 @@ public class PhysicsObject extends JPanel {
 			}
 		}
 
-		if(swingWeapon) {
-			if(swingDown && objectCollision(lastX+11, lastY, true) && leftOrientation > 0)
-				hitObject.moveSpeed += 1*hitObject.damagePercentage;
-			else if(objectCollision(lastX-11, lastY, true) && leftOrientation < 0)
-				hitObject.moveSpeed -= 1*hitObject.damagePercentage;
+		if(swingWeapon) {	//Swing weapon of player object and check if hit
+			if(swingDown && objectCollision(lastX+11, lastY, true) && rightOrientation > 0) {	//Deal damage to the right
+				hitObject.moveSpeed += (1*hitObject.damagePercentage);
+				hitObject.damagePercentage += weapon.getDamage();
+				System.out.println("left");
+			}
+			else if(swingDown && objectCollision(lastX-11, lastY, true) && rightOrientation < 0) {	//Deal damage to the left
+				hitObject.moveSpeed -= (1*hitObject.damagePercentage);
+				hitObject.damagePercentage += weapon.getDamage();
+			}
 			
 			if(swingDown && weapon.swingDown()) swingDown = false;
 			if(!swingDown) {
@@ -126,7 +131,7 @@ public class PhysicsObject extends JPanel {
 		if(dx != 0) {
 			friction = false;	//No friction while user is pressing the move key
 			moveSpeed = dx;
-			if(dx<0 && leftOrientation>0 || dx>0 && leftOrientation<0) {
+			if(dx<0 && rightOrientation>0 || dx>0 && rightOrientation<0) {
 				img = flip(toBufferedImage(img), true);
 				weapon.setImg(flip(toBufferedImage(weapon.getImg()), false));
 			}
@@ -171,7 +176,7 @@ public class PhysicsObject extends JPanel {
 	}
 
 	Image flip(BufferedImage sprite, boolean player) {
-		if(player) leftOrientation *= -1;
+		if(player) rightOrientation *= -1;
 		BufferedImage img = new BufferedImage(sprite.getWidth(), sprite.getHeight(), BufferedImage.TYPE_INT_ARGB);
 		for(int i = sprite.getWidth()-1; i>0; i--) 
 			for(int j=0; j<sprite.getHeight(); j++)
