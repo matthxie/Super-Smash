@@ -13,7 +13,8 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 	public static ArrayList<PhysicsObject> physicsObjectList = new ArrayList<PhysicsObject>();	//All physics objects	
 	public static ArrayList<Platform> platformList = new ArrayList<Platform>();	//All platform objects
 	public static ArrayList<Weapon> weaponList = new ArrayList<Weapon>();	//All weapon objects
-	
+	Image backgroundImage  = Toolkit.getDefaultToolkit().createImage("better.jpg").getScaledInstance(width, height,java.awt.Image.SCALE_SMOOTH);
+
 	JFrame frame;
 	JPanel panel = new whiteboard();	//whiteboard is a method which creates a panel that you can "draw" objects onto
 
@@ -28,12 +29,12 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 		physicsObjectList.add(new PhysicsObject("yoshi.png", "sword.png", ThreadLocalRandom.current().nextInt(100, 300 + 1), 100, 30, 40));	//Adds the two blocks ArrayList
 		physicsObjectList.add(new PhysicsObject("yoshi.png", "sword.png", ThreadLocalRandom.current().nextInt(550, 750 + 1), 100, 30, 40));
 		
-		platformList.add(new Platform(400, 92 ,101, 5));
-		platformList.add(new Platform(280, 170 ,102, 5));
-		platformList.add(new Platform(519, 170 ,102, 5));
-		platformList.add(new Platform(400, 245 ,101, 5));
-		platformList.add(new Platform(158, 245 ,107, 5));
-		platformList.add(new Platform(637, 245 ,105, 5));
+		platformList.add(new Platform(400, 92 ,101, 7));
+		platformList.add(new Platform(280, 170 ,102, 7));
+		platformList.add(new Platform(519, 170 ,102, 7));
+		platformList.add(new Platform(400, 245 ,101, 7));
+		platformList.add(new Platform(158, 245 ,107, 7));
+		platformList.add(new Platform(637, 245 ,105, 7));
 		platformList.add(new Platform(90, 315 ,710, 15));
 		
 		for(int i=0; i<physicsObjectList.size(); i++) 
@@ -93,7 +94,7 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 	public class whiteboard extends JPanel {	//Make a new JPanel that you can draw objects onto (Can't draw stuff anywhere you want onto normal JPanels)
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);	//Call paintComponent from the overlord JPanel
-			//g.drawImage(backgroundImage, 0, 0, null);
+			g.drawImage(backgroundImage, 0, 0, null);
 
 			for(int i=0; i<physicsObjectList.size(); i++) //Draws all the obejcts from physicsObjectList
 				physicsObjectList.get(i).draw(g);
