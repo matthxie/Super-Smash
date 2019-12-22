@@ -105,7 +105,6 @@ public class PhysicsObject extends JPanel {
 			if(swingDown && objectCollision(lastX+11, lastY, true) && rightOrientation > 0) {	//Deal damage to the right
 				hitObject.moveSpeed += (1*hitObject.damagePercentage);
 				hitObject.damagePercentage += weapon.getDamage();
-				System.out.println("left");
 			}
 			else if(swingDown && objectCollision(lastX-11, lastY, true) && rightOrientation < 0) {	//Deal damage to the left
 				hitObject.moveSpeed -= (1*hitObject.damagePercentage);
