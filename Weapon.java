@@ -77,4 +77,8 @@ public class Weapon {
 		if(angle >= 90) return true;
 		return false;
 	}
+	
+	public double getDamage() {
+		return damage;
+	}
 }
