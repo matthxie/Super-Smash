@@ -58,15 +58,23 @@ public class Weapon {
 		lastY = y;
 	}
 	
+	public void setImg(Image image) {
+		img = image;
+	}
+	
+	public Image getImg() {
+		return img;
+	}
+	
 	public boolean swingDown() {
-		angle-=2;
-		if(angle == 36) return true;
+		angle-=3;
+		if(angle <= 35) return true;
 		return false;
 	}
 	
 	public boolean swingUp() {
-		angle+=2;
-		if(angle == 90) return true;
+		angle+=3;
+		if(angle >= 90) return true;
 		return false;
 	}
 }
