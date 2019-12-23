@@ -129,6 +129,16 @@ public class PhysicsObject extends JPanel {
 					}
 				}
 			}
+			
+			if(friction) {	//Flip the image to face the other object if this object is not being moved by player
+				for(int i=0; i<Physics.physicsObjectList.size(); i++) {	//Check if this is currently facing the other player, if not flip
+					PhysicsObject temp = Physics.physicsObjectList.get(i);
+					if(temp!=this && (temp.lastX<lastX && rightOrientation>0) || (temp.lastX>lastX && rightOrientation<0)) {
+						img = flip(toBufferedImage(img), true);	
+						weapon.setImg(flip(toBufferedImage(weapon.getImg()), false));
+					}
+				}
+			}
 
 			weapon.setX(lastX-objectW);
 			weapon.setY(lastY+(objectH/2));
@@ -147,6 +157,7 @@ public class PhysicsObject extends JPanel {
 		if(dx != 0) {
 			friction = false;	//No friction while user is pressing the move key
 			moveSpeed = dx;
+			
 			if(dx<0 && rightOrientation>0 || dx>0 && rightOrientation<0) {
 				img = flip(toBufferedImage(img), true);
 				weapon.setImg(flip(toBufferedImage(weapon.getImg()), false));
