@@ -13,7 +13,8 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 	public static ArrayList<PhysicsObject> physicsObjectList = new ArrayList<PhysicsObject>();	//All physics objects	
 	public static ArrayList<Platform> platformList = new ArrayList<Platform>();	//All platform objects
 	public static ArrayList<Weapon> weaponList = new ArrayList<Weapon>();	//All weapon objects
-	
+	Image backgroundImage  = Toolkit.getDefaultToolkit().createImage("better.jpg").getScaledInstance(width, height,java.awt.Image.SCALE_SMOOTH);
+
 	JFrame frame;
 	JPanel panel = new whiteboard();	//whiteboard is a method which creates a panel that you can "draw" objects onto
 
@@ -90,13 +91,13 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 	public class whiteboard extends JPanel {	//Make a new JPanel that you can draw objects onto (Can't draw stuff anywhere you want onto normal JPanels)
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);	//Call paintComponent from the overlord JPanel
-			//g.drawImage(backgroundImage, 0, 0, null);
+			g.drawImage(backgroundImage, 0, 0, null);
 
 			for(int i=0; i<physicsObjectList.size(); i++) //Draws all the obejcts from physicsObjectList
 				physicsObjectList.get(i).draw(g);
 			
-			for(int i=0; i<platformList.size(); i++) //Draws all the obejcts from physicsObjectList
-				platformList.get(i).draw(g);
+//			for(int i=0; i<platformList.size(); i++) //Draws all the obejcts from physicsObjectList
+//				platformList.get(i).draw(g);
 			
 			for(int j=0; j<weaponList.size(); j++)	//Draw contents in weaponList
 				weaponList.get(j).draw(g);

@@ -2,15 +2,18 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.ThreadLocalRandom;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
 public class PhysicsObject extends JPanel {
 	private Weapon weapon;
-
+	private int numDeath;
+	private boolean deadRightNow = false;
 	private int objectW;	//Object dimensions
 	private int objectH;
-
+	private long tempTime;
 	private int lastX;	//Current X value
 	private int lastY;	//Current Y value
 
@@ -63,67 +66,81 @@ public class PhysicsObject extends JPanel {
 
 	public void draw(Graphics g) {	//The object's own draw method (this is what whiteboard from the physics class calls to draw onto panel)
 		Graphics2D gg = (Graphics2D) g;
-		
-		//Make the object fall
-		if(falling && !platformCollision() && !objectCollision(lastX, lastY, false)) {
-			if(fallSpeed < 0) fallSpeed += 0.5;	//Slow down upward speed until it becomes 0
-			else {
-				fallSpeed = 2;	//After the object starts falling, its speed is modified by multiplying fallSpeed with fallingTime (acceleration) 
-				fallingTime += 0.21;	//Increase fallingTime (not based on any clocks, this is just a value)
+		if(!deadRightNow) {
+			if(this.lastX > Physics.width || this.lastX < 0 || this.lastY> Physics.height) {
+				this.numDeath++;
+				tempTime = System.currentTimeMillis();
+				deadRightNow=true;
 			}
-		}
 
-		//Check to see if object should fall
-		if(platformCollision() || objectCollision(lastX, lastY, false)) {	//Check if object is at a certain height (for ground)
-			if(fallSpeed > 0) {
-				falling = false;	//Stop falling if on ground
-				fallingTime = 1;	//Reset the fallingTime (has to be always at least 1, otherwise would start at a lower falling speed)
-			}
-			else falling = true;
-		}
-		else falling = true;	//Fall if not on ground
 
-		//Fall only if falling boolean says true
-		if(falling) lastY += fallSpeed * fallingTime;	//fallingTime is a modifier
-
-		//Move if not at left or right boundaries
-		if(!objectCollision(lastX+moveSpeed, lastY, false)) {
-			if(!friction) lastX += moveSpeed;	//Move if there is no friction
-			else {
-				if(moveSpeed > 0 && !falling) moveSpeed -= 0.8;	//Increase or decrease moveSpeed until it's 0
-				else if(moveSpeed > 0) moveSpeed -= 0.4;	//This line basically makes sure the object's lateral speed still exists in midair
-
-				if(moveSpeed < 0 && !falling) moveSpeed += 0.8;
-				else if(moveSpeed < 0) moveSpeed += 0.4;
-
-				if(moveSpeed != 0) lastX += moveSpeed;	//Move the object until the moveSpeed becomes 0
-				if(moveSpeed == 0) friction = false;
-			}
-		}
-
-		if(swingWeapon) {	//Swing weapon of player object and check if hit
-			if(swingDown && objectCollision(lastX+11, lastY, true) && rightOrientation > 0) {	//Deal damage to the right
-				hitObject.moveSpeed += (1*hitObject.damagePercentage);
-				hitObject.damagePercentage += weapon.getDamage();
-			}
-			else if(swingDown && objectCollision(lastX-11, lastY, true) && rightOrientation < 0) {	//Deal damage to the left
-				hitObject.moveSpeed -= (1*hitObject.damagePercentage);
-				hitObject.damagePercentage += weapon.getDamage();
-			}
-			
-			if(swingDown && weapon.swingDown()) swingDown = false;
-			if(!swingDown) {
-				if(weapon.swingUp()) {
-					swingWeapon = false;
-					swingDown = true;
+			//Make the object fall
+			if(falling && !platformCollision() && !objectCollision(lastX, lastY, false)) {
+				if(fallSpeed < 0) fallSpeed += 0.5;	//Slow down upward speed until it becomes 0
+				else {
+					fallSpeed = 2;	//After the object starts falling, its speed is modified by multiplying fallSpeed with fallingTime (acceleration) 
+					fallingTime += 0.21;	//Increase fallingTime (not based on any clocks, this is just a value)
 				}
 			}
+
+			//Check to see if object should fall
+			if(platformCollision() || objectCollision(lastX, lastY, false)) {	//Check if object is at a certain height (for ground)
+				if(fallSpeed > 0) {
+					falling = false;	//Stop falling if on ground
+					fallingTime = 1;	//Reset the fallingTime (has to be always at least 1, otherwise would start at a lower falling speed)
+				}
+				else falling = true;
+			}
+			else falling = true;	//Fall if not on ground
+
+			//Fall only if falling boolean says true
+			if(falling) lastY += fallSpeed * fallingTime;	//fallingTime is a modifier
+
+			//Move if not at left or right boundaries
+			if(!objectCollision(lastX+moveSpeed, lastY, false)) {
+				if(!friction) lastX += moveSpeed;	//Move if there is no friction
+				else {
+					if(moveSpeed > 0 && !falling) moveSpeed -= 0.8;	//Increase or decrease moveSpeed until it's 0
+					else if(moveSpeed > 0) moveSpeed -= 0.4;	//This line basically makes sure the object's lateral speed still exists in midair
+
+					if(moveSpeed < 0 && !falling) moveSpeed += 0.8;
+					else if(moveSpeed < 0) moveSpeed += 0.4;
+
+					if(moveSpeed != 0) lastX += moveSpeed;	//Move the object until the moveSpeed becomes 0
+					if(moveSpeed == 0) friction = false;
+				}
+			}
+
+			if(swingWeapon) {	//Swing weapon of player object and check if hit
+				if(swingDown && objectCollision(lastX+11, lastY, true) && rightOrientation > 0) {	//Deal damage to the right
+					hitObject.moveSpeed += (1*hitObject.damagePercentage);
+					hitObject.damagePercentage += weapon.getDamage();
+				}
+				else if(swingDown && objectCollision(lastX-11, lastY, true) && rightOrientation < 0) {	//Deal damage to the left
+					hitObject.moveSpeed -= (1*hitObject.damagePercentage);
+					hitObject.damagePercentage += weapon.getDamage();
+				}
+
+				if(swingDown && weapon.swingDown()) swingDown = false;
+				if(!swingDown) {
+					if(weapon.swingUp()) {
+						swingWeapon = false;
+						swingDown = true;
+					}
+				}
+			}
+
+			weapon.setX(lastX-objectW);
+			weapon.setY(lastY+(objectH/2));
+
+			gg.drawImage(img, lastX, lastY, null);
 		}
-
-		weapon.setX(lastX-objectW);
-		weapon.setY(lastY+(objectH/2));
-
-		gg.drawImage(img, lastX, lastY, null);
+		else if(this.tempTime+1000<System.currentTimeMillis()){
+			this.lastX=ThreadLocalRandom.current().nextInt(100, 750 + 1);
+			this.lastY=0;
+			this.deadRightNow=false;
+			
+		}
 	}
 
 	public void moveX(double dx) {	//Increase moveSpeed, which is how much the object moves with each refresh (0 means not moving)
