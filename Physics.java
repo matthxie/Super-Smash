@@ -9,10 +9,10 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 	public static final int width = 900;
 
 	//Put any and all objects you create into an ArrayList, the whiteboard method will draw their contents onto the panel
-	//Might have to make a new object class containing non physics stuff and use the AnyOtherObject ArrayList for platforms and decorations
 	public static ArrayList<PhysicsObject> physicsObjectList = new ArrayList<PhysicsObject>();	//All physics objects	
 	public static ArrayList<Platform> platformList = new ArrayList<Platform>();	//All platform objects
 	public static ArrayList<Weapon> weaponList = new ArrayList<Weapon>();	//All weapon objects
+	
 	Image backgroundImage  = Toolkit.getDefaultToolkit().createImage("better.jpg").getScaledInstance(width, height,java.awt.Image.SCALE_SMOOTH);
 
 	JFrame frame;
