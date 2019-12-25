@@ -22,6 +22,7 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 		frame = new JFrame("Super Smash");	//Frame stuff
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(width, height);
+		frame.setResizable(false);
 		frame.addKeyListener(this);		
 		
 		panel.setLayout(new BorderLayout());	
