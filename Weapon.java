@@ -15,6 +15,7 @@ public class Weapon {
 	private int weaponH;
 
 	private int angle;
+	private int flipped;
 	
 	private double speed;
 	private double damage;
@@ -32,6 +33,7 @@ public class Weapon {
 		this.weaponH = height;
 		
 		this.angle = 90;
+		this.flipped = 0;
 
 		this.speed = speed;
 		this.damage = damage; 
@@ -40,14 +42,18 @@ public class Weapon {
 
 	public void draw(Graphics g) {
 		Graphics2D gg = (Graphics2D) g;	
-		AffineTransform old = new AffineTransform();
+		
 		AffineTransform at = new AffineTransform();
-		at.rotate(Math.toRadians(angle), lastX+weaponW, lastY+(weaponH/16)+(90-angle));
-		//at.translate(lastX-weaponW, lastY+weaponH);
+		if(flipped == 0) at.rotate(Math.toRadians(angle), lastX+weaponW, lastY+(90-angle));
+		else {
+			at.rotate(Math.toRadians(angle), lastX+weaponH+150, (lastY-weaponW)-145);
+			//at.translate(90, 80);
+		}
+	
 		gg.setTransform(at);
-		gg.drawImage(img, lastX, lastY, weaponW, weaponH, null);
+		if(flipped == 235) gg.drawImage(img, lastX+145, lastY-155, weaponW, weaponH, null);
+		else gg.drawImage(img, lastX, lastY, weaponW, weaponH, null);
 		at.setToIdentity();
-		gg.setTransform(old);		
 	}
 
 	public void setX(int x) {
@@ -68,14 +74,30 @@ public class Weapon {
 	
 	public boolean swingDown() {
 		angle-=3;
-		if(angle <= 35) return true;
+		if(angle <= 35+flipped) return true;
 		return false;
 	}
 	
 	public boolean swingUp() {
 		angle+=3;
-		if(angle >= 90) return true;
+		if(angle >= 90+flipped) return true;
 		return false;
+	}
+	
+	public void setFlipped() {
+		if(flipped == 235) {
+			flipped = 0;
+			angle = 90;
+		}
+		else {
+			flipped = 235;
+			angle = 270;
+		}
+	}
+	
+	public boolean getFlipped() {
+		if(flipped == 235) return true;
+		else return false;
 	}
 	
 	public double getDamage() {
