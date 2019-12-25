@@ -48,7 +48,7 @@ public class PhysicsObject extends JPanel {
 		this.moveSpeed = 0;
 
 		this.falling = true;
-		this.friction = false;
+		this.friction = true;
 
 		this.fallingTime = 1;
 
@@ -121,15 +121,26 @@ public class PhysicsObject extends JPanel {
 					hitObject.damagePercentage += weapon.getDamage();
 				}
 
-				if(swingDown && weapon.swingDown()) swingDown = false;
-				if(!swingDown) {
-					if(weapon.swingUp()) {
-						swingWeapon = false;
-						swingDown = true;
+				if(!weapon.getFlipped()) {
+					if(swingDown && weapon.swingDown()) swingDown = false;
+					if(!swingDown) {
+						if(weapon.swingUp()) {
+							swingWeapon = false;
+							swingDown = true;
+						}
+					}
+				}
+				else {
+					if(swingDown && weapon.swingUp()) swingDown = false;
+					if(!swingDown) {
+						if(weapon.swingDown()) {
+							swingWeapon = false;
+							swingDown = true;
+						}
 					}
 				}
 			}
-			
+
 			if(friction) {	//Flip the image to face the other object if this object is not being moved by player
 				for(int i=0; i<Physics.physicsObjectList.size(); i++) {	//Check if this is currently facing the other player, if not flip
 					PhysicsObject temp = Physics.physicsObjectList.get(i);
@@ -140,16 +151,22 @@ public class PhysicsObject extends JPanel {
 				}
 			}
 
-			weapon.setX(lastX-objectW);
-			weapon.setY(lastY+(objectH/2));
+			if(rightOrientation<0) {
+				weapon.setX(lastX-objectW);
+				weapon.setY(lastY+(objectH/2));
+			}
+			else {
+				weapon.setX(lastX-objectW-170);
+				weapon.setY(lastY+(objectH/2)+140);
+			}
 
 			gg.drawImage(img, lastX, lastY, null);
 		}
 		else if(this.tempTime+1000<System.currentTimeMillis()){
-			this.lastX=ThreadLocalRandom.current().nextInt(100, 750 + 1);
-			this.lastY=0;
-			this.deadRightNow=false;
-			
+			this.lastX = ThreadLocalRandom.current().nextInt(100, 750 + 1);
+			this.lastY = 0;
+			this.deadRightNow = false;
+
 		}
 	}
 
@@ -157,7 +174,7 @@ public class PhysicsObject extends JPanel {
 		if(dx != 0) {
 			friction = false;	//No friction while user is pressing the move key
 			moveSpeed = dx;
-			
+
 			if(dx<0 && rightOrientation>0 || dx>0 && rightOrientation<0) {
 				img = flip(toBufferedImage(img), true);
 				weapon.setImg(flip(toBufferedImage(weapon.getImg()), false));
@@ -202,8 +219,10 @@ public class PhysicsObject extends JPanel {
 		return false;
 	}
 
-	Image flip(BufferedImage sprite, boolean player) {
-		if(player) rightOrientation *= -1;
+	Image flip(BufferedImage sprite, boolean player) {	//Flip image in parameter
+		if(player) rightOrientation *= -1;	
+		else weapon.setFlipped();
+
 		BufferedImage img = new BufferedImage(sprite.getWidth(), sprite.getHeight(), BufferedImage.TYPE_INT_ARGB);
 		for(int i = sprite.getWidth()-1; i>0; i--) 
 			for(int j=0; j<sprite.getHeight(); j++)
@@ -211,7 +230,7 @@ public class PhysicsObject extends JPanel {
 		return img;
 	}
 
-	public BufferedImage toBufferedImage(Image img) {
+	public BufferedImage toBufferedImage(Image img) {	//Convert Image into BufferedImage
 		if(img instanceof BufferedImage) return (BufferedImage) img;
 
 		BufferedImage temp = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
