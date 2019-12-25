@@ -3,19 +3,21 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.ThreadLocalRandom;
-
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
-public class PhysicsObject extends JPanel {
-	private Weapon weapon;
+public class PhysicsObject extends JPanel {	
 	private int numDeath;
 	private boolean deadRightNow = false;
+	private long tempTime;
+	
 	private int objectW;	//Object dimensions
 	private int objectH;
-	private long tempTime;
+	
 	private int lastX;	//Current X value
 	private int lastY;	//Current Y value
+	
+	private Weapon weapon;	//Weapon to be used by the player object
 
 	private double fallSpeed;	//How fast the object is falling (Gravity)
 	private double moveSpeed;	//How fast the object moves
@@ -25,15 +27,16 @@ public class PhysicsObject extends JPanel {
 
 	private double fallingTime;	//How long the object has BEEN falling (for very not real gravitational acceleration)
 
-	private boolean swingWeapon;
-	private boolean swingDown;
+	private boolean swingWeapon;	//Tells when the player is attacking
+	private boolean swingDown;		//Tells when the player is during the first of the two-phase attack animation
 
-	private int rightOrientation;
+	private int rightOrientation;	//Which way the player is facing
 
-	private double damagePercentage;
-	private PhysicsObject hitObject;
+	private double damagePercentage;	//Damage percentage of the player, decides how far the player flies when hit
+	
+	private PhysicsObject hitObject;	//Stores the player object that has been hit by this player object
 
-	private Image img;
+	private Image img;	//The image used for this player object
 
 	public PhysicsObject(String file, String weaponName, int x, int y, int width, int height) {
 		this.objectW = width;
@@ -64,8 +67,9 @@ public class PhysicsObject extends JPanel {
 		} catch(IOException e) {}
 	}
 
-	public void draw(Graphics g) {	//The object's own draw method (this is what whiteboard from the physics class calls to draw onto panel)
+	public void draw(Graphics g) {	//The object's own draw method (this is what canvas from the physics class calls to draw onto panel)
 		Graphics2D gg = (Graphics2D) g;
+		
 		if(!deadRightNow) {
 			if(this.lastX > Physics.width || this.lastX < 0 || this.lastY> Physics.height) {
 				this.numDeath++;
@@ -73,9 +77,7 @@ public class PhysicsObject extends JPanel {
 				deadRightNow=true;
 			}
 
-
-			//Make the object fall
-			if(falling && !platformCollision() && !objectCollision(lastX, lastY, false)) {
+			if(falling && !platformCollision() && !objectCollision(lastX, lastY, false)) { //Make the object fall
 				if(fallSpeed < 0) fallSpeed += 0.5;	//Slow down upward speed until it becomes 0
 				else {
 					fallSpeed = 2;	//After the object starts falling, its speed is modified by multiplying fallSpeed with fallingTime (acceleration) 
@@ -83,28 +85,25 @@ public class PhysicsObject extends JPanel {
 				}
 			}
 
-			//Check to see if object should fall
-			if(platformCollision() || objectCollision(lastX, lastY, false)) {	//Check if object is at a certain height (for ground)
+			if(platformCollision() || objectCollision(lastX, lastY, false)) {	//Object will fall if not standing on platform or collision
 				if(fallSpeed > 0) {
-					falling = false;	//Stop falling if on ground
+					falling = false;	//Stop falling if on a platform
 					fallingTime = 1;	//Reset the fallingTime (has to be always at least 1, otherwise would start at a lower falling speed)
 				}
 				else falling = true;
 			}
 			else falling = true;	//Fall if not on ground
 
-			//Fall only if falling boolean says true
-			if(falling) lastY += fallSpeed * fallingTime;	//fallingTime is a modifier
+			if(falling) lastY += fallSpeed * fallingTime;	//Fall only if falling boolean says true, fallingTime is a modifier
 
-			//Move if not at left or right boundaries
-			if(!objectCollision(lastX+moveSpeed, lastY, false)) {
+			if(!objectCollision(lastX+moveSpeed, lastY, false)) {	//Move if movement will not result in a collision
 				if(!friction) lastX += moveSpeed;	//Move if there is no friction
 				else {
 					if(moveSpeed > 0 && !falling) moveSpeed -= 0.8;	//Increase or decrease moveSpeed until it's 0
-					else if(moveSpeed > 0) moveSpeed -= 0.4;	//This line basically makes sure the object's lateral speed still exists in midair
+					else if(moveSpeed > 0) moveSpeed -= 0.04;	//Object's lateral speed still exists while object is in the air
 
 					if(moveSpeed < 0 && !falling) moveSpeed += 0.8;
-					else if(moveSpeed < 0) moveSpeed += 0.4;
+					else if(moveSpeed < 0) moveSpeed += 0.04;
 
 					if(moveSpeed != 0) lastX += moveSpeed;	//Move the object until the moveSpeed becomes 0
 					if(moveSpeed == 0) friction = false;
@@ -113,15 +112,17 @@ public class PhysicsObject extends JPanel {
 
 			if(swingWeapon) {	//Swing weapon of player object and check if hit
 				if(swingDown && objectCollision(lastX+11, lastY, true) && rightOrientation > 0) {	//Deal damage to the right
-					hitObject.moveSpeed += (1*hitObject.damagePercentage);
+					hitObject.moveSpeed += (1*hitObject.damagePercentage);	//Push object right
+					hitObject.fallSpeed -= (1*hitObject.damagePercentage);	//Push object up 
 					hitObject.damagePercentage += weapon.getDamage();
 				}
 				else if(swingDown && objectCollision(lastX-11, lastY, true) && rightOrientation < 0) {	//Deal damage to the left
-					hitObject.moveSpeed -= (1*hitObject.damagePercentage);
+					hitObject.moveSpeed -= (1*hitObject.damagePercentage);	//Push object left
+					hitObject.fallSpeed -= (1*hitObject.damagePercentage);	//Push object up
 					hitObject.damagePercentage += weapon.getDamage();
 				}
 
-				if(!weapon.getFlipped()) {
+				if(!weapon.getFlipped()) {	//Attack animation when weapon is facing left
 					if(swingDown && weapon.swingDown()) swingDown = false;
 					if(!swingDown) {
 						if(weapon.swingUp()) {
@@ -130,7 +131,7 @@ public class PhysicsObject extends JPanel {
 						}
 					}
 				}
-				else {
+				else {	//Attack animation when weapon is facing right
 					if(swingDown && weapon.swingUp()) swingDown = false;
 					if(!swingDown) {
 						if(weapon.swingDown()) {
@@ -162,7 +163,7 @@ public class PhysicsObject extends JPanel {
 
 			gg.drawImage(img, lastX, lastY, null);
 		}
-		else if(this.tempTime+1000<System.currentTimeMillis()){
+		else if(this.tempTime+1000<System.currentTimeMillis()) {	
 			this.lastX = ThreadLocalRandom.current().nextInt(100, 750 + 1);
 			this.lastY = 0;
 			this.deadRightNow = false;
