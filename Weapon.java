@@ -73,13 +73,13 @@ public class Weapon {
 	}
 	
 	public boolean swingDown() {
-		angle-=3;
+		angle-=5;
 		if(angle <= 35+flipped) return true;
 		return false;
 	}
 	
 	public boolean swingUp() {
-		angle+=3;
+		angle+=5;
 		if(angle >= 90+flipped) return true;
 		return false;
 	}
