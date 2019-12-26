@@ -112,13 +112,13 @@ public class PhysicsObject extends JPanel {
 
 			if(swingWeapon) {	//Swing weapon of player object and check if hit
 				if(swingDown && objectCollision(lastX+11, lastY, true) && rightOrientation > 0) {	//Deal damage to the right
-					hitObject.moveSpeed += (1*hitObject.damagePercentage);	//Push object right
-					hitObject.fallSpeed -= (1*hitObject.damagePercentage);	//Push object up 
+					hitObject.moveSpeed += (hitObject.damagePercentage*weapon.getDamage());	//Push object right
+					hitObject.fallSpeed -= (2*hitObject.damagePercentage*weapon.getDamage());	//Push object up 
 					hitObject.damagePercentage += weapon.getDamage();
 				}
 				else if(swingDown && objectCollision(lastX-11, lastY, true) && rightOrientation < 0) {	//Deal damage to the left
-					hitObject.moveSpeed -= (1*hitObject.damagePercentage);	//Push object left
-					hitObject.fallSpeed -= (1*hitObject.damagePercentage);	//Push object up
+					hitObject.moveSpeed -= (hitObject.damagePercentage*weapon.getDamage());	//Push object left
+					hitObject.fallSpeed -= (2*hitObject.damagePercentage*weapon.getDamage());	//Push object up
 					hitObject.damagePercentage += weapon.getDamage();
 				}
 
