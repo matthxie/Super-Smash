@@ -3,8 +3,8 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class runThisFirst implements KeyListener {	//KeyListener is like ActionListener but for keyboard
-	public static final int height = 400;	//Window dimensions
-	public static final int width = 600;
+	public static final int height = 600;	//Window dimensions
+	public static final int width = 900;
 
 	public static boolean start = false;
 

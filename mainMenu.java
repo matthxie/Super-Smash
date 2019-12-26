@@ -7,7 +7,7 @@ public class mainMenu implements KeyListener {	//KeyListener is like ActionListe
 	public static final int height = 600;	//Window dimensions
 	public static final int width = 900;
 
-	public static boolean start = false;
+	public static boolean start = true;
 
 	public static int selection = 1;
 		
@@ -23,7 +23,7 @@ public class mainMenu implements KeyListener {	//KeyListener is like ActionListe
 		
 		panel.setLayout(new BorderLayout());	
 		
-		putImage("smashBrosEntry.png");
+		selectionMenu(1);
 		
 		frame.add(panel);
 		
@@ -52,12 +52,8 @@ public class mainMenu implements KeyListener {	//KeyListener is like ActionListe
 	public void keyTyped(KeyEvent e) {}	//KeyListener is an interface so must implement all empty methods, this one is just useless
 
 	public void keyPressed(KeyEvent e) {	//When the keys are pressed (when they're released is the method after this one)
-		if(e.getKeyCode() == KeyEvent.VK_SPACE) {
-			if(!start) {
-				selectionMenu(1); 
-				start = true;
-			}
-		}
+
+			
 		if(e.getKeyCode() == KeyEvent.VK_DOWN && start && selection < 5) {
 			selection++;
 			selectionMenu(selection);
