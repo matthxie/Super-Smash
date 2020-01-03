@@ -162,11 +162,20 @@ public class PhysicsObject extends JPanel {
 
 			gg.drawImage(img, lastX, lastY, null);
 		}
-		else if(this.tempTime+1000<System.currentTimeMillis()) {	
-			this.lastX = ThreadLocalRandom.current().nextInt(100, 750 + 1);
-			this.lastY = 0;
-			this.deadRightNow = false;
-
+		else if(numDeath > 3) {
+			System.out.println("You've died 3 times! Game over.");
+			System.exit(0);
+		}
+		else if(this.tempTime+1000<System.currentTimeMillis()) {	//Respawn the player at the top of the screen
+			lastX = ThreadLocalRandom.current().nextInt(100, 750 + 1);
+			lastY = 0;
+			
+			damagePercentage = 0;
+			moveSpeed = 0;
+			fallSpeed = 0;
+			falling = true;
+			numDeath++;
+			deadRightNow = false;
 		}
 	}
 
