@@ -164,7 +164,6 @@ public class PhysicsObject extends JPanel {
 		}
 		else if(numDeath > 3) {
 			Physics.paused = true;
-			System.out.println("You've died 3 times! Game over.");
 			
 			int goOrNot = JOptionPane.showConfirmDialog(Physics.frame,
 					"You Died Three Times. Exit?",
@@ -177,7 +176,7 @@ public class PhysicsObject extends JPanel {
 			}
 			else{
 				Physics.quit = true;
-				new mainMenu();
+				
 			}
 			
 

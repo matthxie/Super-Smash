@@ -46,7 +46,20 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 
 		frame.setLocationRelativeTo(null);	//Make the frame visible
 		frame.setVisible(true);
-
+		Thread closeThread = new Thread(new Runnable() {
+			public void run() {
+				while(!quit) {
+					try {
+						Thread.sleep(10);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				frame.dispose();
+				new mainMenu();
+			}
+		});
 		Thread animationThread = new Thread(new Runnable() {	//The main loop
 			public void run() {	
 				while(!quit) {
@@ -57,12 +70,25 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 					}
 					
 				}
-				frame.dispose();
+				
 
 			}
 		});	
-		
+		closeThread.start();
 		animationThread.start();	//Start the main loop
+		
+
+	}
+
+	public static void closeAll() {
+		quit=true;
+		paused=true;
+	}
+	public void clearAll() {
+		panel.removeAll();
+		panel.revalidate();
+		panel.repaint();
+
 	}
 
 	public void keyTyped(KeyEvent e) {}		//KeyListener is an interface so must implement all empty methods, this one is just useless
