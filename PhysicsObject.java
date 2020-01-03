@@ -46,7 +46,7 @@ public class PhysicsObject extends JPanel {
 		this.lastY = y;
 
 		this.weapon = new Weapon(weaponName, lastX-(objectW/2), lastY+(objectH/2), 40, 40, 2, 0.2, 10);
-
+		
 		this.fallSpeed = -10;
 		this.moveSpeed = 0;
 
@@ -64,7 +64,7 @@ public class PhysicsObject extends JPanel {
 
 		try { this.img = ImageIO.read(new File(file));
 		img = img.getScaledInstance(objectW, objectH, Image.SCALE_SMOOTH); 
-		} catch(IOException e) {}
+		} catch(IOException e) {}		
 	}
 
 	public void draw(Graphics g) {	//The object's own draw method (this is what canvas from the physics class calls to draw onto panel)
@@ -115,11 +115,13 @@ public class PhysicsObject extends JPanel {
 					hitObject.moveSpeed += (hitObject.damagePercentage*weapon.getDamage());	//Push object right
 					hitObject.fallSpeed -= (2*hitObject.damagePercentage*weapon.getDamage());	//Push object up 
 					hitObject.damagePercentage += weapon.getDamage();
+					hitObject.friction = true;
 				}
 				else if(swingDown && objectCollision(lastX-11, lastY, true) && rightOrientation < 0) {	//Deal damage to the left
 					hitObject.moveSpeed -= (hitObject.damagePercentage*weapon.getDamage());	//Push object left
 					hitObject.fallSpeed -= (2*hitObject.damagePercentage*weapon.getDamage());	//Push object up
 					hitObject.damagePercentage += weapon.getDamage();
+					hitObject.friction = true;
 				}
 
 				if(!weapon.getFlipped()) {	//Attack animation when weapon is facing left
