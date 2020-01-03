@@ -163,8 +163,25 @@ public class PhysicsObject extends JPanel {
 			gg.drawImage(img, lastX, lastY, null);
 		}
 		else if(numDeath > 3) {
+			Physics.paused = true;
 			System.out.println("You've died 3 times! Game over.");
-			System.exit(0);
+			
+			int goOrNot = JOptionPane.showConfirmDialog(Physics.frame,
+					"You Died Three Times. Exit?",
+					"Game Over",
+					JOptionPane.YES_NO_OPTION);
+			;
+			if(goOrNot == 0) {
+				
+				System.exit(0);
+			}
+			else{
+				Physics.quit = true;
+				new mainMenu();
+			}
+			
+
+			System.out.println(goOrNot);
 		}
 		else if(this.tempTime+1000<System.currentTimeMillis()) {	//Respawn the player at the top of the screen
 			lastX = ThreadLocalRandom.current().nextInt(100, 750 + 1);
