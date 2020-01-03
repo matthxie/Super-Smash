@@ -71,7 +71,7 @@ public class PhysicsObject extends JPanel {
 		Graphics2D gg = (Graphics2D) g;
 		
 		if(!deadRightNow) {
-			if(this.lastX > Physics.width || this.lastX < 0 || this.lastY> Physics.height) {
+			if(this.lastX > Physics.width || this.lastX < 0 || this.lastY > Physics.height) {
 				this.numDeath++;
 				tempTime = System.currentTimeMillis();
 				deadRightNow=true;
@@ -99,14 +99,13 @@ public class PhysicsObject extends JPanel {
 			if(!objectCollision(lastX+moveSpeed, lastY, false)) {	//Move if movement will not result in a collision
 				if(!friction) lastX += moveSpeed;	//Move if there is no friction
 				else {
-					if(moveSpeed > 0 && !falling) moveSpeed -= 0.8;	//Increase or decrease moveSpeed until it's 0
-					else if(moveSpeed > 0) moveSpeed -= 0.04;	//Object's lateral speed still exists while object is in the air
+					if(moveSpeed > 0 && !falling) moveSpeed -= 0.8;	//Ground friction: decrease moveSpeed until it's 0 (when going right)
+					else if(moveSpeed > 0) moveSpeed -= 0.04;	//Air friction: rate of lateral speed decrease while in midair (going right)
 
-					if(moveSpeed < 0 && !falling) moveSpeed += 0.8;
-					else if(moveSpeed < 0) moveSpeed += 0.04;
+					if(moveSpeed < 0 && !falling) moveSpeed += 0.8; //Ground friction: increase moveSpeed until it's 0 (when going left)
+					else if(moveSpeed < 0) moveSpeed += 0.04;	//Air friction while going left
 
-					if(moveSpeed != 0) lastX += moveSpeed;	//Move the object until the moveSpeed becomes 0
-					if(moveSpeed == 0) friction = false;
+					if(moveSpeed != 0) lastX += moveSpeed;	//Move the object until the moveSpeed becomes 0 (indicating move key released)
 				}
 			}
 
@@ -114,14 +113,12 @@ public class PhysicsObject extends JPanel {
 				if(swingDown && objectCollision(lastX+11, lastY, true) && rightOrientation > 0) {	//Deal damage to the right
 					hitObject.moveSpeed += (hitObject.damagePercentage*weapon.getDamage());	//Push object right
 					hitObject.fallSpeed -= (2*hitObject.damagePercentage*weapon.getDamage());	//Push object up 
-					hitObject.damagePercentage += weapon.getDamage();
-					hitObject.friction = true;
+					hitObject.damagePercentage += weapon.getDamage();	//Add to other player's damage percentage
 				}
 				else if(swingDown && objectCollision(lastX-11, lastY, true) && rightOrientation < 0) {	//Deal damage to the left
-					hitObject.moveSpeed -= (hitObject.damagePercentage*weapon.getDamage());	//Push object left
-					hitObject.fallSpeed -= (2*hitObject.damagePercentage*weapon.getDamage());	//Push object up
+					hitObject.moveSpeed -= (hitObject.damagePercentage*weapon.getDamage());	
+					hitObject.fallSpeed -= (2*hitObject.damagePercentage*weapon.getDamage());
 					hitObject.damagePercentage += weapon.getDamage();
-					hitObject.friction = true;
 				}
 
 				if(!weapon.getFlipped()) {	//Attack animation when weapon is facing left
