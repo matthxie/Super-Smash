@@ -69,7 +69,7 @@ public class PhysicsObject extends JPanel {
 
 	public void draw(Graphics g) {	//The object's own draw method (this is what canvas from the physics class calls to draw onto panel)
 		Graphics2D gg = (Graphics2D) g;
-		
+				
 		if(!deadRightNow) {
 			if(this.lastX > Physics.width || this.lastX < 0 || this.lastY > Physics.height) {
 				this.numDeath++;
@@ -159,8 +159,11 @@ public class PhysicsObject extends JPanel {
 				weapon.setX(lastX-objectW-170);
 				weapon.setY(lastY+(objectH/2)+140);
 			}
-
+			
+			gg.setFont(new Font("Comic Sans MS", Font.BOLD, 15));
+			gg.setColor(Color.red);
 			gg.drawImage(img, lastX, lastY, null);
+			gg.drawString(Double.toString(Math.round(damagePercentage*100)/100)+"%", lastX, lastY-5);
 		}
 		else if(numDeath > 3) {
 			Physics.paused = true;
@@ -169,17 +172,10 @@ public class PhysicsObject extends JPanel {
 					"You Died Three Times. Exit?",
 					"Game Over",
 					JOptionPane.YES_NO_OPTION);
-			;
-			if(goOrNot == 0) {
-				
-				System.exit(0);
-			}
-			else{
-				Physics.quit = true;
-				
-			}
+		
+			if(goOrNot == 0) System.exit(0);
+			else Physics.quit = true;
 			
-
 			System.out.println(goOrNot);
 		}
 		else if(this.tempTime+1000<System.currentTimeMillis()) {	//Respawn the player at the top of the screen
@@ -266,6 +262,14 @@ public class PhysicsObject extends JPanel {
 		return temp;
 	}
 
+	public int getX() {
+		return lastX;
+	}
+	
+	public int getY() {
+		return lastY;
+	}
+	
 	public Weapon getweapon() {
 		return weapon;
 	}
@@ -284,5 +288,8 @@ public class PhysicsObject extends JPanel {
 
 	public void setMoveSpeed(double speed) {
 		moveSpeed = speed;
+	}
+	public double getDamagePercentage() {
+		return damagePercentage;
 	}
 }
