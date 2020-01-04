@@ -14,10 +14,10 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 	public static ArrayList<Weapon> weaponList = new ArrayList<Weapon>();	//All weapon objects
 	public static boolean paused = false;
 	public static boolean quit = false;
-	Image backgroundImage  = Toolkit.getDefaultToolkit().createImage("better.jpg").getScaledInstance(width, height,java.awt.Image.SCALE_SMOOTH);
+	public static Image backgroundImage  = Toolkit.getDefaultToolkit().createImage("better.jpg").getScaledInstance(width, height,java.awt.Image.SCALE_SMOOTH);
 
 	public static JFrame frame;
-	JPanel panel = new canvas();	//canvas is a method which creates a panel that you can "draw" objects onto
+	public static JPanel panel = new canvas();	//canvas is a method which creates a panel that you can "draw" objects onto
 
 	public Physics() {
 		frame = new JFrame("Super Smash");	//Frame stuff
@@ -26,9 +26,9 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 		frame.setResizable(false);
 		frame.addKeyListener(this);		
 
-		panel.setLayout(new BorderLayout());	
+		panel.setLayout(null);
 
-		physicsObjectList.add(new PhysicsObject("yoshi.png", "sword.png", ThreadLocalRandom.current().nextInt(100, 300 + 1), 100, 30, 40));	//Adds the two blocks ArrayList
+		physicsObjectList.add(new PhysicsObject("yoshi.png", "sword.png", ThreadLocalRandom.current().nextInt(100, 300 + 1), 100, 30, 40));
 		physicsObjectList.add(new PhysicsObject("yoshi.png", "sword.png", ThreadLocalRandom.current().nextInt(550, 750 + 1), 100, 30, 40));
 
 		platformList.add(new Platform(400, 92 ,101, 5));
@@ -63,32 +63,27 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 		Thread animationThread = new Thread(new Runnable() {	//The main loop
 			public void run() {	
 				while(!quit) {
-					while (!paused) {	
+					while (!paused) {							
 						frame.repaint();	//Refresh frame and panel
 						panel.repaint();
-						try {Thread.sleep(17);} catch (Exception ex) {}	//10 millisecond delay between each refresh
+						try {Thread.sleep(16);} catch (Exception ex) {}	//10 millisecond delay between each refresh
 					}
-					
 				}
-				
-
 			}
 		});	
 		closeThread.start();
 		animationThread.start();	//Start the main loop
-		
-
 	}
 
 	public static void closeAll() {
-		quit=true;
-		paused=true;
+		quit = true;
+		paused = true;
 	}
+	
 	public void clearAll() {
 		panel.removeAll();
 		panel.revalidate();
 		panel.repaint();
-
 	}
 
 	public void keyTyped(KeyEvent e) {}		//KeyListener is an interface so must implement all empty methods, this one is just useless
@@ -102,7 +97,7 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 			if(!physicsObjectList.get(0).fallingStatus()) physicsObjectList.get(0).moveY(-10);	//Negative Y moves up
 		}
 
-		if(e.getKeyCode() == KeyEvent.VK_COMMA) 
+		if(e.getKeyCode() == KeyEvent.VK_COMMA)	//Attack animation
 			physicsObjectList.get(0).swingWeapon();
 
 		//WASD for object2
@@ -113,7 +108,7 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 			if(!physicsObjectList.get(1).fallingStatus()) physicsObjectList.get(1).moveY(-10);
 		}
 
-		if(e.getKeyCode() == KeyEvent.VK_X) 
+		if(e.getKeyCode() == KeyEvent.VK_X) 	//Attack animation
 			physicsObjectList.get(1).swingWeapon();
 	}
 
@@ -122,22 +117,19 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 		if(e.getKeyCode() == KeyEvent.VK_A || e.getKeyCode() == KeyEvent.VK_D) physicsObjectList.get(1).moveX(0); //Object2
 	}
 
-	public class canvas extends JPanel {	//Make a new JPanel that you can draw objects onto (Can't draw stuff anywhere you want onto normal JPanels)
+	public static class canvas extends JPanel {	//Make a new JPanel that you can draw objects onto (Can't draw stuff anywhere you want onto normal JPanels)
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);	//Call paintComponent from the overlord JPanel
 			g.drawImage(backgroundImage, 0, 0, null);
-
+	
 			for(int i=0; i<physicsObjectList.size(); i++) //Draws all the obejcts from physicsObjectList
 				physicsObjectList.get(i).draw(g);
-
-			//			for(int i=0; i<platformList.size(); i++) //Draws all the obejcts from physicsObjectList
-			//				platformList.get(i).draw(g);
 
 			for(int j=0; j<weaponList.size(); j++)	//Draw contents in weaponList
 				weaponList.get(j).draw(g);
 		}
 	}
-
+	
 	public static void main(String[] args) {	//Call the graphics constructor
 		new Physics();
 	}
