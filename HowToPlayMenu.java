@@ -2,18 +2,18 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class runThisFirst implements KeyListener {	//KeyListener is like ActionListener but for keyboard
-	public static final int height = 600;	//Window dimensions
-	public static final int width = 900;
+public class HowToPlayMenu implements KeyListener {	//KeyListener is like ActionListener but for keyboard
+	public static final int height = 400;	//Window dimensions
+	public static final int width = 600;
 
-	public static boolean start = false;
+	public static boolean start = true;
 
 	public static int selection = 1;
 
 	JFrame frame;	
 	JPanel panel = new JPanel();	
 	
-	public runThisFirst() {
+	public HowToPlayMenu() {
 		frame = new JFrame("Menu");	//Frame stuff
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(width, height);
@@ -21,18 +21,18 @@ public class runThisFirst implements KeyListener {	//KeyListener is like ActionL
 		frame.addKeyListener(this);
 		
 		panel.setLayout(new BorderLayout());	
-		ImageIcon icon = new ImageIcon("smashBrosEntry.png");
-		Image image = icon.getImage().getScaledInstance(width, height,  java.awt.Image.SCALE_SMOOTH);
-		JLabel pic = new JLabel(new ImageIcon(image));
-		panel.add(pic);
-	
-
+		
+		selectionMenu(1);
 		frame.add(panel);
 
 		frame.setLocationRelativeTo(null);	//Make the frame visible
 		frame.setVisible(true);		
 	}
 	
+	public void selectionMenu(int selection) {
+		clearAll();
+		putImage("smashMenu" + selection + ".png");
+	}
 	
 	public void putImage(String img) {
 		ImageIcon icon = new ImageIcon(img);
@@ -50,13 +50,26 @@ public class runThisFirst implements KeyListener {	//KeyListener is like ActionL
 	public void keyTyped(KeyEvent e) {}	//KeyListener is an interface so must implement all empty methods, this one is just useless
 
 	public void keyPressed(KeyEvent e) {	//When the keys are pressed (when they're released is the method after this one)
-		frame.setVisible(false);
-		new mainMenu();
+
+		if(e.getKeyCode() == KeyEvent.VK_DOWN && start && selection < 5) {
+			selection++;
+			selectionMenu(selection);
+		}
+		if(e.getKeyCode() == KeyEvent.VK_UP && start && selection > 1) {
+			selection--;
+			selectionMenu(selection);
+		}
+		if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+			clearAll();
+			frame.setVisible(false);
+			if(selection == 1) new Physics();
+			if(selection == 2) ;
+		}
 	}
 
 	public void keyReleased(KeyEvent e) {}
 
 	public static void main(String[] args) {	//Call the graphics constructor
-		new runThisFirst();
+		new HowToPlayMenu();
 	}
 }
