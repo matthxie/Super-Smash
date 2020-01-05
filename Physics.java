@@ -16,8 +16,11 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 
 	public static boolean paused = false;
 	public static boolean quit = false;
-	public static Image backgroundImage  = Toolkit.getDefaultToolkit().createImage("better.jpg").getScaledInstance(width, height,java.awt.Image.SCALE_SMOOTH);
+	
+	public static Image backgroundImage = Toolkit.getDefaultToolkit().createImage("better.jpg").getScaledInstance(width, height,java.awt.Image.SCALE_SMOOTH);
+	public static Image fireball = Toolkit.getDefaultToolkit().createImage("fireball.png").getScaledInstance(40, 40,java.awt.Image.SCALE_SMOOTH);
 
+	
 	public static JFrame frame;
 	public static JPanel panel = new canvas();	//canvas is a method which creates a panel that you can "draw" objects onto
 
