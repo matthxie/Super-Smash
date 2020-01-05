@@ -5,7 +5,7 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-public class Weapon {
+public class MeleeWeapon {
 	private Image img;
 
 	private int lastX; 
@@ -21,7 +21,7 @@ public class Weapon {
 	private double damage;
 	private double mass;
 
-	public Weapon(String imgName, int x, int y, int width, int height, double speed, double damage, double mass) {
+	public MeleeWeapon(String imgName, int x, int y, int width, int height, double speed, double damage, double mass) {
 		try { img = ImageIO.read(new File(imgName)); 
 		img = img.getScaledInstance(width, height, Image.SCALE_SMOOTH); 
 		} catch (IOException e) {}
@@ -51,8 +51,10 @@ public class Weapon {
 		}
 	
 		gg.setTransform(at);
+		
 		if(flipped == 235) gg.drawImage(img, lastX+145, lastY-155, weaponW, weaponH, null);
 		else gg.drawImage(img, lastX, lastY, weaponW, weaponH, null);
+		
 		at.setToIdentity();
 	}
 
