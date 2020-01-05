@@ -11,7 +11,9 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 	//Put any and all objects you create into an ArrayList, the canvas method will draw their contents onto the panel
 	public static ArrayList<PhysicsObject> physicsObjectList = new ArrayList<PhysicsObject>();	//All physics objects	
 	public static ArrayList<Platform> platformList = new ArrayList<Platform>();	//All platform objects
-	public static ArrayList<Weapon> weaponList = new ArrayList<Weapon>();	//All weapon objects
+	public static ArrayList<MeleeWeapon> weaponList = new ArrayList<MeleeWeapon>();	//All weapon objects
+	public static ArrayList<ProjectileWeapon> projectileList = new ArrayList<ProjectileWeapon>(); //All projectiles 
+
 	public static boolean paused = false;
 	public static boolean quit = false;
 	public static Image backgroundImage  = Toolkit.getDefaultToolkit().createImage("better.jpg").getScaledInstance(width, height,java.awt.Image.SCALE_SMOOTH);
@@ -49,12 +51,7 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 		Thread closeThread = new Thread(new Runnable() {
 			public void run() {
 				while(!quit) {
-					try {
-						Thread.sleep(10);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+					try { Thread.sleep(10);} catch (InterruptedException e) {}
 				}
 				frame.dispose();
 				new mainMenu();
@@ -63,10 +60,11 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 		Thread animationThread = new Thread(new Runnable() {	//The main loop
 			public void run() {	
 				while(!quit) {
-					while (!paused) {							
+					while (!paused) {
+
 						frame.repaint();	//Refresh frame and panel
 						panel.repaint();
-						try {Thread.sleep(16);} catch (Exception ex) {}	//10 millisecond delay between each refresh
+						try {Thread.sleep(17);} catch (Exception ex) {}	//10 millisecond delay between each refresh
 					}
 				}
 			}
@@ -79,7 +77,7 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 		quit = true;
 		paused = true;
 	}
-	
+
 	public void clearAll() {
 		panel.removeAll();
 		panel.revalidate();
@@ -117,19 +115,24 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 		if(e.getKeyCode() == KeyEvent.VK_A || e.getKeyCode() == KeyEvent.VK_D) physicsObjectList.get(1).moveX(0); //Object2
 	}
 
-	public static class canvas extends JPanel {	//Make a new JPanel that you can draw objects onto (Can't draw stuff anywhere you want onto normal JPanels)
+	public static class canvas extends JPanel {	//Make a new JPanel which unlike regular JPanels you can draw objects onto 
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);	//Call paintComponent from the overlord JPanel
 			g.drawImage(backgroundImage, 0, 0, null);
-	
-			for(int i=0; i<physicsObjectList.size(); i++) //Draws all the obejcts from physicsObjectList
+
+			for(int i=0; i<physicsObjectList.size(); i++) //Draw objects from physicsObjectList
 				physicsObjectList.get(i).draw(g);
+
+			for(int l=0; l<projectileList.size(); l++) {	//Draw projectiles
+				if(projectileList.get(l).attack()) projectileList.remove(l);
+				else projectileList.get(l).draw(g);
+			}
 
 			for(int j=0; j<weaponList.size(); j++)	//Draw contents in weaponList
 				weaponList.get(j).draw(g);
 		}
 	}
-	
+
 	public static void main(String[] args) {	//Call the graphics constructor
 		new Physics();
 	}
