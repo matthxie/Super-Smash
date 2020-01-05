@@ -4,7 +4,7 @@ import java.awt.event.*;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class physics2 implements KeyListener {	//KeyListener is like ActionListener but for keyboard
+public class Physics2 implements KeyListener {	//KeyListener is like ActionListener but for keyboard
 	public static final int height = 600;	//Window dimensions
 	public static final int width = 900;
 	//public static final Image[] characterChoices;
@@ -23,7 +23,7 @@ public class physics2 implements KeyListener {	//KeyListener is like ActionListe
 	
 	
 	public static ArrayList<Platform> platformList = new ArrayList<Platform>();	//All platform objects
-	public static ArrayList<Weapon> weaponList = new ArrayList<Weapon>();	//All weapon objects
+	public static ArrayList<MeleeWeapon> weaponList = new ArrayList<MeleeWeapon>();	//All weapon objects
 	
 	public static boolean paused = false;
 	public static boolean quit = false;
@@ -32,7 +32,7 @@ public class physics2 implements KeyListener {	//KeyListener is like ActionListe
 	public static JFrame frame;
 	JPanel panel = new canvas();	//canvas is a method which creates a panel that you can "draw" objects onto
 
-	public physics2() {
+	public Physics2() {
 		frame = new JFrame("Super Smash");	//Frame stuff
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(width, height);
@@ -143,6 +143,6 @@ public class physics2 implements KeyListener {	//KeyListener is like ActionListe
 	}
 
 	public static void main(String[] args) {	//Call the graphics constructor
-		new physics2();
+		new Physics2();
 	}
 }
