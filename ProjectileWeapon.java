@@ -1,9 +1,4 @@
 import java.awt.*;
-import java.awt.geom.AffineTransform;
-import java.io.File;
-import java.io.IOException;
-
-import javax.imageio.ImageIO;
 
 public class ProjectileWeapon {
 	private Image img;
@@ -20,11 +15,9 @@ public class ProjectileWeapon {
 	
 	private int orientation;
 	
-	public ProjectileWeapon(String imgName, int x, int y, int width, int height, double speed, double damage, double mass, int orientation) {
-		try { img = ImageIO.read(new File(imgName)); 
-		img = img.getScaledInstance(width, height, Image.SCALE_SMOOTH); 
-		} catch (IOException e) {}
-
+	public ProjectileWeapon(Image img, int x, int y, int width, int height, double speed, double damage, double mass, int orientation) {
+		this.img = img;
+		
 		this.lastX = x;
 		this.lastY = y;
 		
