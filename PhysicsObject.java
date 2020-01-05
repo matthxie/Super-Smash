@@ -6,7 +6,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
-public class PhysicsObject extends JPanel {	
+public class PhysicsObject extends JPanel {
 	private int numDeath;
 	private boolean deadRightNow = false;
 	private long tempTime;
@@ -64,7 +64,7 @@ public class PhysicsObject extends JPanel {
 
 		try { this.img = ImageIO.read(new File(file));
 		img = img.getScaledInstance(objectW, objectH, Image.SCALE_SMOOTH); 
-		} catch(IOException e) {}		
+		} catch(IOException e) {}
 	}
 
 	public void draw(Graphics g) {	//The object's own draw method (this is what canvas from the physics class calls to draw onto panel)
@@ -275,7 +275,7 @@ public class PhysicsObject extends JPanel {
 	}
 
 	public void swingWeapon() {
-		Physics.projectileList.add(new ProjectileWeapon("fireball.png", lastX-(objectW/2), lastY+(objectH/2), 40, 40, 2, 0.2, 10, rightOrientation));
+		Physics.projectileList.add(new ProjectileWeapon(Physics.fireball, lastX-(objectW/2), lastY+(objectH/2), 40, 40, 2, 0.2, 10, rightOrientation));
 		swingWeapon = true;
 	}
 
