@@ -17,7 +17,7 @@ public class PhysicsObject extends JPanel {
 	private int lastX;	//Current X value
 	private int lastY;	//Current Y value
 	
-	private Weapon weapon;	//Weapon to be used by the player object
+	private MeleeWeapon weapon;	//Weapon to be used by the player object
 
 	private double fallSpeed;	//How fast the object is falling (Gravity)
 	private double moveSpeed;	//How fast the object moves
@@ -45,7 +45,7 @@ public class PhysicsObject extends JPanel {
 		this.lastX = x;
 		this.lastY = y;
 
-		this.weapon = new Weapon(weaponName, lastX-(objectW/2), lastY+(objectH/2), 40, 40, 2, 0.2, 10);
+		this.weapon = new MeleeWeapon(weaponName, lastX-(objectW/2), lastY+(objectH/2), 40, 40, 2, 0.2, 10);
 		
 		this.fallSpeed = -10;
 		this.moveSpeed = 0;
@@ -60,7 +60,7 @@ public class PhysicsObject extends JPanel {
 
 		this.rightOrientation = -1;
 
-		this.damagePercentage = 1;
+		this.damagePercentage = 0;
 
 		try { this.img = ImageIO.read(new File(file));
 		img = img.getScaledInstance(objectW, objectH, Image.SCALE_SMOOTH); 
@@ -112,12 +112,12 @@ public class PhysicsObject extends JPanel {
 			if(swingWeapon) {	//Swing weapon of player object and check if hit
 				if(swingDown && objectCollision(lastX+11, lastY, true) && rightOrientation > 0) {	//Deal damage to the right
 					hitObject.moveSpeed += (hitObject.damagePercentage*weapon.getDamage());	//Push object right
-					hitObject.fallSpeed -= (2*hitObject.damagePercentage*weapon.getDamage());	//Push object up 
+					hitObject.fallSpeed -= (1.5*hitObject.damagePercentage*weapon.getDamage());	//Push object up 
 					hitObject.damagePercentage += weapon.getDamage();	//Add to other player's damage percentage
 				}
 				else if(swingDown && objectCollision(lastX-11, lastY, true) && rightOrientation < 0) {	//Deal damage to the left
 					hitObject.moveSpeed -= (hitObject.damagePercentage*weapon.getDamage());	
-					hitObject.fallSpeed -= (2*hitObject.damagePercentage*weapon.getDamage());
+					hitObject.fallSpeed -= (1.5*hitObject.damagePercentage*weapon.getDamage());
 					hitObject.damagePercentage += weapon.getDamage();
 				}
 
@@ -270,11 +270,12 @@ public class PhysicsObject extends JPanel {
 		return lastY;
 	}
 	
-	public Weapon getweapon() {
+	public MeleeWeapon getweapon() {
 		return weapon;
 	}
 
 	public void swingWeapon() {
+		Physics.projectileList.add(new ProjectileWeapon("fireball.png", lastX-(objectW/2), lastY+(objectH/2), 40, 40, 2, 0.2, 10, rightOrientation));
 		swingWeapon = true;
 	}
 
