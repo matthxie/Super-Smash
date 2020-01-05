@@ -10,13 +10,14 @@ public class PhysicsObject extends JPanel {
 	private int numDeath;
 	private boolean deadRightNow = false;
 	private long tempTime;
-	
+
 	private int objectW;	//Object dimensions
 	private int objectH;
-	
+
 	private int lastX;	//Current X value
 	private int lastY;	//Current Y value
-	
+
+	private boolean melee;
 	private MeleeWeapon weapon;	//Weapon to be used by the player object
 
 	private double fallSpeed;	//How fast the object is falling (Gravity)
@@ -30,23 +31,27 @@ public class PhysicsObject extends JPanel {
 	private boolean swingWeapon;	//Tells when the player is attacking
 	private boolean swingDown;		//Tells when the player is during the first of the two-phase attack animation
 
-	private int rightOrientation;	//Which way the player is facing
+	private int orientation;	//Which way the player is facing
 
 	private double damagePercentage;	//Damage percentage of the player, decides how far the player flies when hit
-	
+
 	private PhysicsObject hitObject;	//Stores the player object that has been hit by this player object
 
 	private Image img;	//The image used for this player object
 
-	public PhysicsObject(String file, String weaponName, int x, int y, int width, int height) {
+	public PhysicsObject(String file, String weaponName, boolean melee, int x, int y, int width, int height) {
 		this.objectW = width;
 		this.objectH = height;
 
 		this.lastX = x;
 		this.lastY = y;
 
-		this.weapon = new MeleeWeapon(weaponName, lastX-(objectW/2), lastY+(objectH/2), 40, 40, 2, 0.2, 10);
-		
+		this.melee = melee;
+		if(melee) {
+			this.weapon = new MeleeWeapon(weaponName, lastX-(objectW/2), lastY+(objectH/2), 40, 40, 2, 0.2, 10);
+			Physics.weaponList.add(weapon);
+		}
+
 		this.fallSpeed = -10;
 		this.moveSpeed = 0;
 
@@ -58,7 +63,7 @@ public class PhysicsObject extends JPanel {
 		this.swingWeapon = false;
 		this.swingDown = true;
 
-		this.rightOrientation = -1;
+		this.orientation = -1;
 
 		this.damagePercentage = 0;
 
@@ -69,7 +74,7 @@ public class PhysicsObject extends JPanel {
 
 	public void draw(Graphics g) {	//The object's own draw method (this is what canvas from the physics class calls to draw onto panel)
 		Graphics2D gg = (Graphics2D) g;
-				
+
 		if(!deadRightNow) {
 			if(this.lastX > Physics.width || this.lastX < 0 || this.lastY > Physics.height) {
 				this.numDeath++;
@@ -110,16 +115,8 @@ public class PhysicsObject extends JPanel {
 			}
 
 			if(swingWeapon) {	//Swing weapon of player object and check if hit
-				if(swingDown && objectCollision(lastX+11, lastY, true) && rightOrientation > 0) {	//Deal damage to the right
-					hitObject.moveSpeed += (hitObject.damagePercentage*weapon.getDamage());	//Push object right
-					hitObject.fallSpeed -= (1.5*hitObject.damagePercentage*weapon.getDamage());	//Push object up 
-					hitObject.damagePercentage += weapon.getDamage();	//Add to other player's damage percentage
-				}
-				else if(swingDown && objectCollision(lastX-11, lastY, true) && rightOrientation < 0) {	//Deal damage to the left
-					hitObject.moveSpeed -= (hitObject.damagePercentage*weapon.getDamage());	
-					hitObject.fallSpeed -= (1.5*hitObject.damagePercentage*weapon.getDamage());
-					hitObject.damagePercentage += weapon.getDamage();
-				}
+				if(swingDown && objectCollision(lastX+11, lastY, true) && orientation > 0 || objectCollision(lastX-11, lastY, true) && orientation < 0) 	//Deal damage to the right
+					dealDamage(weapon.getDamage(), orientation, hitObject);
 
 				if(!weapon.getFlipped()) {	//Attack animation when weapon is facing left
 					if(swingDown && weapon.swingDown()) swingDown = false;
@@ -144,22 +141,24 @@ public class PhysicsObject extends JPanel {
 			if(friction) {	//Flip the image to face the other object if this object is not being moved by player
 				for(int i=0; i<Physics.physicsObjectList.size(); i++) {	//Check if this is currently facing the other player, if not flip
 					PhysicsObject temp = Physics.physicsObjectList.get(i);
-					if(temp!=this && (temp.lastX<lastX && rightOrientation>0) || (temp.lastX>lastX && rightOrientation<0)) {
+					if(temp!=this && (temp.lastX<lastX && orientation>0) || (temp.lastX>lastX && orientation<0)) {
 						img = flip(toBufferedImage(img), true);	
-						weapon.setImg(flip(toBufferedImage(weapon.getImg()), false));
+						if(melee) weapon.setImg(flip(toBufferedImage(weapon.getImg()), false));
 					}
 				}
 			}
 
-			if(rightOrientation<0) {
-				weapon.setX(lastX-objectW);
-				weapon.setY(lastY+(objectH/2));
+			if(melee) {
+				if(orientation<0) {
+					weapon.setX(lastX-objectW);
+					weapon.setY(lastY+(objectH/2));
+				}
+				else {
+					weapon.setX(lastX-objectW-170);
+					weapon.setY(lastY+(objectH/2)+140);
+				}
 			}
-			else {
-				weapon.setX(lastX-objectW-170);
-				weapon.setY(lastY+(objectH/2)+140);
-			}
-			
+
 			gg.setFont(new Font("Comic Sans MS", Font.BOLD, 15));
 			gg.setColor(Color.red);
 			gg.drawImage(img, lastX, lastY, null);
@@ -167,21 +166,21 @@ public class PhysicsObject extends JPanel {
 		}
 		else if(numDeath > 3) {
 			Physics.paused = true;
-			
+
 			int goOrNot = JOptionPane.showConfirmDialog(Physics.frame,
 					"You Died Three Times. Exit?",
 					"Game Over",
 					JOptionPane.YES_NO_OPTION);
-		
+
 			if(goOrNot == 0) System.exit(0);
 			else Physics.quit = true;
-			
+
 			System.out.println(goOrNot);
 		}
 		else if(this.tempTime+1000<System.currentTimeMillis()) {	//Respawn the player at the top of the screen
 			lastX = ThreadLocalRandom.current().nextInt(100, 750 + 1);
 			lastY = 0;
-			
+
 			damagePercentage = 0;
 			moveSpeed = 0;
 			fallSpeed = 0;
@@ -196,9 +195,9 @@ public class PhysicsObject extends JPanel {
 			friction = false;	//No friction while user is pressing the move key
 			moveSpeed = dx;
 
-			if(dx<0 && rightOrientation>0 || dx>0 && rightOrientation<0) {
+			if(dx<0 && orientation>0 || dx>0 && orientation<0) {
 				img = flip(toBufferedImage(img), true);
-				weapon.setImg(flip(toBufferedImage(weapon.getImg()), false));
+				if(melee) weapon.setImg(flip(toBufferedImage(weapon.getImg()), false));
 			}
 		}
 		else friction = true;	//Friction comes in after the user releases the move key
@@ -240,8 +239,14 @@ public class PhysicsObject extends JPanel {
 		return false;
 	}
 
+	public void dealDamage(double damage, int orientation, PhysicsObject o) {
+		o.moveSpeed += (o.damagePercentage*damage) * this.orientation;	//Push object right
+		o.fallSpeed -= (1.5*o.damagePercentage*damage);	//Push object up 
+		o.damagePercentage += damage;	//Add to other player's damage percentage
+	}
+
 	Image flip(BufferedImage sprite, boolean player) {	//Flip image in parameter
-		if(player) rightOrientation *= -1;	
+		if(player) orientation *= -1;	
 		else weapon.setFlipped();
 
 		BufferedImage img = new BufferedImage(sprite.getWidth(), sprite.getHeight(), BufferedImage.TYPE_INT_ARGB);
@@ -250,7 +255,7 @@ public class PhysicsObject extends JPanel {
 				img.setRGB(sprite.getWidth()-i, j, sprite.getRGB(i, j));
 		return img;
 	}
-	
+
 	public BufferedImage toBufferedImage(Image img) {	//Convert Image into BufferedImage
 		if(img instanceof BufferedImage) return (BufferedImage) img;
 
@@ -265,18 +270,22 @@ public class PhysicsObject extends JPanel {
 	public int getX() {
 		return lastX;
 	}
-	
+
 	public int getY() {
 		return lastY;
 	}
-	
+
+	public int getOrientation() {
+		return orientation;
+	}
+
 	public MeleeWeapon getweapon() {
 		return weapon;
 	}
 
 	public void swingWeapon() {
-		Physics.projectileList.add(new ProjectileWeapon(Physics.fireball, lastX-(objectW/2), lastY+(objectH/8), 50, 30, 2, 0.2, 10, rightOrientation));
-		swingWeapon = true;
+		if(!melee) Physics.projectileList.add(new ProjectileWeapon(Physics.fireball, this, lastX-(objectW/2), lastY+(objectH/8), 50, 30, 4, 0.5, 10, orientation));
+		else swingWeapon = true;
 	}
 
 	public boolean fallingStatus() {
