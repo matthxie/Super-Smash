@@ -18,7 +18,8 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 	public static boolean quit = false;
 	
 	public static Image backgroundImage = Toolkit.getDefaultToolkit().createImage("better.jpg").getScaledInstance(width, height,java.awt.Image.SCALE_SMOOTH);
-	public static Image fireball = Toolkit.getDefaultToolkit().createImage("fireball.png").getScaledInstance(40, 40,java.awt.Image.SCALE_SMOOTH);
+	public static Image fireball = Toolkit.getDefaultToolkit().createImage("fireball.png");
+	public static Image sword = Toolkit.getDefaultToolkit().createImage("sword.png");
 
 	
 	public static JFrame frame;
@@ -33,8 +34,8 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 
 		panel.setLayout(null);
 
-		physicsObjectList.add(new PhysicsObject("yoshi.png", "sword.png", ThreadLocalRandom.current().nextInt(100, 300 + 1), 100, 30, 40));
-		physicsObjectList.add(new PhysicsObject("yoshi.png", "sword.png", ThreadLocalRandom.current().nextInt(550, 750 + 1), 100, 30, 40));
+		physicsObjectList.add(new PhysicsObject("yoshi.png", "sword.png", true, ThreadLocalRandom.current().nextInt(100, 300 + 1), 100, 30, 40));
+		physicsObjectList.add(new PhysicsObject("yoshi.png", "sword.png", false, ThreadLocalRandom.current().nextInt(550, 750 + 1), 100, 30, 40));
 
 		platformList.add(new Platform(400, 92 ,101, 5));
 		platformList.add(new Platform(280, 170 ,102, 5));
@@ -43,9 +44,6 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 		platformList.add(new Platform(158, 245 ,107, 5));
 		platformList.add(new Platform(637, 245 ,105, 5));
 		platformList.add(new Platform(90, 315 ,710, 15));
-
-		for(int i=0; i<physicsObjectList.size(); i++) 
-			weaponList.add(physicsObjectList.get(i).getweapon());
 
 		frame.add(panel);
 
@@ -64,7 +62,6 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 			public void run() {	
 				while(!quit) {
 					while (!paused) {
-
 						frame.repaint();	//Refresh frame and panel
 						panel.repaint();
 						try {Thread.sleep(17);} catch (Exception ex) {}	//10 millisecond delay between each refresh
@@ -128,7 +125,16 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 
 			for(int l=0; l<projectileList.size(); l++) {	//Draw projectiles
 				if(projectileList.get(l).attack()) projectileList.remove(l);
-				else projectileList.get(l).draw(g);
+				else {
+					projectileList.get(l).draw(g);
+					for(int j=0; j<physicsObjectList.size(); j++) 
+						for(int k=0; k<projectileList.size(); k++) {
+							if(Math.abs(projectileList.get(k).getX()-physicsObjectList.get(j).getX()) <= 5 && Math.abs(projectileList.get(k).getY()-physicsObjectList.get(j).getY()) <= 15 && projectileList.get(k).getOwner() != physicsObjectList.get(j)) {
+								physicsObjectList.get(Math.abs(j-1)).dealDamage(projectileList.get(k).getDamage(), -physicsObjectList.get(j).getOrientation(), physicsObjectList.get(j));
+								projectileList.remove(k);
+							}
+						}
+				}
 			}
 
 			for(int j=0; j<weaponList.size(); j++)	//Draw contents in weaponList
