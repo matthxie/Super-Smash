@@ -11,14 +11,14 @@ public class ChooseCharacterMenu implements KeyListener {	//KeyListener is like 
 	private int currentSelection = 0;
 	private String playerOne,playerTwo;
 	private String[] characterList = new String[] {"Mario", "Donkey Kong", "Link", "Samus", "Yoshi", "Kirby", "Fox", "Pikachu"};
-	private static final int height = 600;	//Window dimensions
-	private static final int width = 900;
+	private final int height = 600;	//Window dimensions
+	private final int width = 900;
 	private Image chooseCharImage  = Toolkit.getDefaultToolkit().createImage("betterSmashChoose.png").getScaledInstance(width, height,java.awt.Image.SCALE_SMOOTH);
 
-	private static int[][] imageBoundsX= new int[][] {
+	private int[][] imageBoundsX= new int[][] {
 		{97,140,0}, {238,141,0}, {379,141,0}, {521,141,0},{662,141,0}, {167,141,0}, {309,141,0}, {450,141,0}, {591, 143,0}
 	};//Order: Mario, Donkey Kong, Link, Samus, Yoshi, Kirby, Fox, Pikachu, Random
-	private static int[][] imageBoundsY = new int[][] {
+	private int[][] imageBoundsY = new int[][] {
 		{84, 121},{84,121},{84,121},{84,121},{84,121}, {206,122}, {206,122}, {206, 122}, {206,123}
 	};//Order: Mario, Donkey Kong, Link, Samus, Yoshi, Kirby, Fox, Pikachu, Random
 
@@ -28,14 +28,12 @@ public class ChooseCharacterMenu implements KeyListener {	//KeyListener is like 
 	public ChooseCharacterMenu() {
 		String fName = "superFont.ttf";
 		File fontFile = new File(fName);		
-		new JLabel();
 
 		try {
 			Font tempfont = Font.createFont(Font.TRUETYPE_FONT, fontFile);
 			font = tempfont.deriveFont((float)(40));
 
 		} catch (FontFormatException e) {
-			System.out.println("Ew");
 		} catch (IOException e) {
 		}
 
@@ -52,6 +50,7 @@ public class ChooseCharacterMenu implements KeyListener {	//KeyListener is like 
 
 		frame.setLocationRelativeTo(null);	//Make the frame visible
 		frame.setVisible(true);	
+		
 		Thread drawSquares = new Thread(new Runnable() {	//The main loop
 			public void run() {	
 
@@ -60,7 +59,7 @@ public class ChooseCharacterMenu implements KeyListener {	//KeyListener is like 
 					panel.repaint();
 					try {Thread.sleep(17);} catch (Exception ex) {}	//10 millisecond delay between each refresh
 				}
-				new mainMenu();
+				new ChooseMapMenu();
 			}
 		});	
 		drawSquares.start();	//Start the main loop
@@ -98,7 +97,7 @@ public class ChooseCharacterMenu implements KeyListener {	//KeyListener is like 
 				else currentSelection = 1;
 
 			else if(e.getKeyCode() == KeyEvent.VK_LEFT)
-				if(currentSelection > 0) {
+				if(currentSelection > 1) {
 					if(imageBoundsX[currentSelection-1][2]==0) {
 						currentSelection--;
 					}
@@ -134,7 +133,6 @@ public class ChooseCharacterMenu implements KeyListener {	//KeyListener is like 
 	public void randomPlayer() {
 		double h = Math.random()*7;
 		int tempSelect =(int) h;
-		System.out.println(h + " "+tempSelect);
 		while(imageBoundsX[tempSelect][2] != 0) {
 			System.out.println(tempSelect);
 			h = Math.random()*7;
@@ -145,14 +143,11 @@ public class ChooseCharacterMenu implements KeyListener {	//KeyListener is like 
 		if(playerNumber == 1) {
 			playerOne = characterList[tempSelect];
 			imageBoundsX[tempSelect][2] = 1;
-			System.out.println("Working");
 		}
 		else if(playerNumber == 2) {
 			playerTwo = characterList[tempSelect];
 			imageBoundsX[tempSelect][2] = 2;
 		}
-		
-		System.out.println("Working");
 
 	}
 	@Override
