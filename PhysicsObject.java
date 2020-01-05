@@ -250,7 +250,7 @@ public class PhysicsObject extends JPanel {
 				img.setRGB(sprite.getWidth()-i, j, sprite.getRGB(i, j));
 		return img;
 	}
-
+	
 	public BufferedImage toBufferedImage(Image img) {	//Convert Image into BufferedImage
 		if(img instanceof BufferedImage) return (BufferedImage) img;
 
@@ -275,7 +275,7 @@ public class PhysicsObject extends JPanel {
 	}
 
 	public void swingWeapon() {
-		Physics.projectileList.add(new ProjectileWeapon(Physics.fireball, lastX-(objectW/2), lastY+(objectH/2), 40, 40, 2, 0.2, 10, rightOrientation));
+		Physics.projectileList.add(new ProjectileWeapon(Physics.fireball, lastX-(objectW/2), lastY+(objectH/8), 50, 30, 2, 0.2, 10, rightOrientation));
 		swingWeapon = true;
 	}
 
