@@ -2,12 +2,13 @@ import java.awt.*;
 
 public class ProjectileWeapon {
 	private Image img;
+	private PhysicsObject initializer;
 
 	private int lastX; 
 	private int lastY;
 	
-	private int weaponW;
-	private int weaponH;
+	private int projectileW;
+	private int projectileH;
 	
 	private double speed;
 	private double damage;
@@ -15,14 +16,15 @@ public class ProjectileWeapon {
 	
 	private int orientation;
 	
-	public ProjectileWeapon(Image img, int x, int y, int width, int height, double speed, double damage, double mass, int orientation) {
+	public ProjectileWeapon(Image img, PhysicsObject initializer, int x, int y, int width, int height, double speed, double damage, double mass, int orientation) {
 		this.img = img;
+		this.initializer = initializer;
 		
 		this.lastX = x;
 		this.lastY = y;
 		
-		this.weaponW = width;
-		this.weaponH = height;
+		this.projectileW = width;
+		this.projectileH = height;
 		
 		this.speed = speed;
 		this.damage = damage; 
@@ -32,8 +34,8 @@ public class ProjectileWeapon {
 	}
 
 	public void draw(Graphics g) {
-		Graphics2D gg = (Graphics2D) g;	
-		gg.drawImage(img, lastX, lastY, weaponW, weaponH, null);
+		Graphics2D gg = (Graphics2D) g;
+		gg.drawImage(img, lastX, lastY, projectileW, projectileH, null);
 	}
 
 	public boolean attack() {
@@ -42,6 +44,18 @@ public class ProjectileWeapon {
 		
 		if(lastX < 0 || lastX > 900) return true;
 		return false;
+	}
+	
+	public int getX() {
+		return lastX;
+	}
+	
+	public int getY() {
+		return lastY;
+	}
+	
+	public PhysicsObject getOwner() {
+		return initializer;
 	}
 	
 	public void setImg(Image image) {
