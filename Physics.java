@@ -33,8 +33,8 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 
 		panel.setLayout(null);
 
-		physicsObjectList.add(new PhysicsObject("yoshi.png", "sword.png", true, ThreadLocalRandom.current().nextInt(100, 300 + 1), 100, 30, 40, 33.3, 10));
-		physicsObjectList.add(new PhysicsObject("yoshi.png", "sword.png", false, ThreadLocalRandom.current().nextInt(550, 750 + 1), 100, 30, 40, 33.3, 20));
+		physicsObjectList.add(new PhysicsObject(1, "yoshi.png", "sword.png", true, ThreadLocalRandom.current().nextInt(100, 300 + 1), 100, 30, 40, 33.3, 10));
+		physicsObjectList.add(new PhysicsObject(2, "yoshi.png", "sword.png", false, ThreadLocalRandom.current().nextInt(550, 750 + 1), 100, 30, 40, 33.3, 20));
 
 		platformList.add(new Platform(400, 92 ,101, 5));
 		platformList.add(new Platform(280, 170 ,102, 5));
@@ -91,7 +91,7 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 		else if(e.getKeyCode() == KeyEvent.VK_LEFT) physicsObjectList.get(0).moveX(-4);	//Get the first object from physicsObjectList, positive X moves right
 
 		if(e.getKeyCode() == KeyEvent.VK_UP) {
-			if(!physicsObjectList.get(0).fallingStatus()) physicsObjectList.get(0).moveY(-10);	//Negative Y moves up
+			if(physicsObjectList.get(0).getNumJumps()<=1) physicsObjectList.get(0).moveY(-10);	//Negative Y moves up
 		}
 
 		if(e.getKeyCode() == KeyEvent.VK_COMMA)	//Attack animation
@@ -102,8 +102,6 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 		else if(e.getKeyCode() == KeyEvent.VK_A) physicsObjectList.get(1).moveX(-4);	//physicsObjectList.get(1): gets second obejct (the only two are the boxes)
 
 		if(e.getKeyCode() == KeyEvent.VK_W) {
-			//if(!physicsObjectList.get(1).fallingStatus() && physicsObjectList.get(1).getNumJumps()==0) physicsObjectList.get(1).moveY(-10);
-			//else if(physicsObjectList.get(1).fallingStatus() && physicsObjectList.get(1).getNumJumps()==1) physicsObjectList.get(1).moveY(-10);
 			if(physicsObjectList.get(1).getNumJumps()<=1) physicsObjectList.get(1).moveY(-10);
 		}
 
