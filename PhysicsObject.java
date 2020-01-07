@@ -217,7 +217,7 @@ public class PhysicsObject extends JPanel {
 	public void moveY(double dy) {	//Same thing as moveSpeed, but with fallSpeed in there for gravity
 		if(dy < 0) {
 			numJumps++;
-			fallingTime = numJumps;
+			fallingTime = 1;
 			fallSpeed = dy;
 		}
 	}
