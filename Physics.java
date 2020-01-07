@@ -12,16 +12,15 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 	public static ArrayList<PhysicsObject> physicsObjectList = new ArrayList<PhysicsObject>();	//All physics objects	
 	public static ArrayList<Platform> platformList = new ArrayList<Platform>();	//All platform objects
 	public static ArrayList<MeleeWeapon> weaponList = new ArrayList<MeleeWeapon>();	//All weapon objects
-	public static ArrayList<ProjectileWeapon> projectileList = new ArrayList<ProjectileWeapon>(); //All projectiles 
+	public static ArrayList<ProjectileWeapon> projectileList = new ArrayList<ProjectileWeapon>(); //All projectiles
 
 	public static boolean paused = false;
 	public static boolean quit = false;
-	
+
 	public static Image backgroundImage = Toolkit.getDefaultToolkit().createImage("better.jpg").getScaledInstance(width, height,java.awt.Image.SCALE_SMOOTH);
 	public static Image fireball = Toolkit.getDefaultToolkit().createImage("fireball.png");
 	public static Image sword = Toolkit.getDefaultToolkit().createImage("sword.png");
 
-	
 	public static JFrame frame;
 	public static JPanel panel = new canvas();	//canvas is a method which creates a panel that you can "draw" objects onto
 
@@ -34,8 +33,8 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 
 		panel.setLayout(null);
 
-		physicsObjectList.add(new PhysicsObject("yoshi.png", "sword.png", true, ThreadLocalRandom.current().nextInt(100, 300 + 1), 100, 30, 40));
-		physicsObjectList.add(new PhysicsObject("yoshi.png", "sword.png", false, ThreadLocalRandom.current().nextInt(550, 750 + 1), 100, 30, 40));
+		physicsObjectList.add(new PhysicsObject("yoshi.png", "sword.png", true, ThreadLocalRandom.current().nextInt(100, 300 + 1), 100, 30, 40, 33.3, 10));
+		physicsObjectList.add(new PhysicsObject("yoshi.png", "sword.png", false, ThreadLocalRandom.current().nextInt(550, 750 + 1), 100, 30, 40, 33.3, 20));
 
 		platformList.add(new Platform(400, 92 ,101, 5));
 		platformList.add(new Platform(280, 170 ,102, 5));
@@ -78,12 +77,12 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 		paused = true;
 	}
 
-	public void clearAll() {
+	public void clearAll() {	//Clear all components from panel
 		panel.removeAll();
 		panel.revalidate();
 		panel.repaint();
 	}
-
+	
 	public void keyTyped(KeyEvent e) {}		//KeyListener is an interface so must implement all empty methods, this one is just useless
 
 	public void keyPressed(KeyEvent e) {	//When the keys are pressed (when they're released is the method after this one)
@@ -103,7 +102,9 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 		else if(e.getKeyCode() == KeyEvent.VK_A) physicsObjectList.get(1).moveX(-4);	//physicsObjectList.get(1): gets second obejct (the only two are the boxes)
 
 		if(e.getKeyCode() == KeyEvent.VK_W) {
-			if(!physicsObjectList.get(1).fallingStatus()) physicsObjectList.get(1).moveY(-10);
+			//if(!physicsObjectList.get(1).fallingStatus() && physicsObjectList.get(1).getNumJumps()==0) physicsObjectList.get(1).moveY(-10);
+			//else if(physicsObjectList.get(1).fallingStatus() && physicsObjectList.get(1).getNumJumps()==1) physicsObjectList.get(1).moveY(-10);
+			if(physicsObjectList.get(1).getNumJumps()<=1) physicsObjectList.get(1).moveY(-10);
 		}
 
 		if(e.getKeyCode() == KeyEvent.VK_X) 	//Attack animation
@@ -124,16 +125,17 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 				physicsObjectList.get(i).draw(g);
 
 			for(int l=0; l<projectileList.size(); l++) {	//Draw projectiles
-				if(projectileList.get(l).attack()) projectileList.remove(l);
+				if(projectileList.get(l).attack()) projectileList.remove(l);	//Returns true if at edge of screen, removes object
 				else {
-					projectileList.get(l).draw(g);
-					for(int j=0; j<physicsObjectList.size(); j++) 
+					projectileList.get(l).draw(g);	//If not at edge of screen, continue drawing object
+					for(int j=0; j<physicsObjectList.size(); j++) {	//Checks if projectile has hit one of the player objects
 						for(int k=0; k<projectileList.size(); k++) {
 							if(Math.abs(projectileList.get(k).getX()-physicsObjectList.get(j).getX()) <= 5 && Math.abs(projectileList.get(k).getY()-physicsObjectList.get(j).getY()) <= 15 && projectileList.get(k).getOwner() != physicsObjectList.get(j)) {
 								physicsObjectList.get(Math.abs(j-1)).dealDamage(projectileList.get(k).getDamage(), -physicsObjectList.get(j).getOrientation(), physicsObjectList.get(j));
 								projectileList.remove(k);
 							}
 						}
+					}
 				}
 			}
 
