@@ -22,7 +22,7 @@ public class runThisFirst implements KeyListener {	//KeyListener is like ActionL
 		
 		panel.setLayout(new BorderLayout());	
 		ImageIcon icon = new ImageIcon("smashBrosEntry.png");
-		Image image = icon.getImage().getScaledInstance(width, height,  java.awt.Image.SCALE_SMOOTH);
+		Image image = icon.getImage().getScaledInstance(width, height, java.awt.Image.SCALE_SMOOTH);
 		JLabel pic = new JLabel(new ImageIcon(image));
 		panel.add(pic);
 	
@@ -36,8 +36,8 @@ public class runThisFirst implements KeyListener {	//KeyListener is like ActionL
 	
 	public void putImage(String img) {
 		ImageIcon icon = new ImageIcon(img);
-		Image image = icon.getImage().getScaledInstance(620, 370,  java.awt.Image.SCALE_SMOOTH);
-		JLabel pic = new JLabel(new ImageIcon(image));
+		Image image = icon.getImage().getScaledInstance(620, 370, java.awt.Image.SCALE_SMOOTH);
+		JLabel pic = new JLabel(new ImageIcon(image));	
 		panel.add(pic);
 	}
 	

@@ -5,7 +5,7 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.util.*;
 
-public class Platform extends JPanel {
+public class Platform { //extends JPanel
 	int topCorner, leftCorner;
 	int longWise, fatWise;
 	

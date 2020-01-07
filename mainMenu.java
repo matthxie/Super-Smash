@@ -12,15 +12,15 @@ public class mainMenu implements KeyListener {	//KeyListener is like ActionListe
 	private int rectX,rectY,rectWidth,rectHeight;
 	private Font font = null;
 	private int currentSelection = 0;
-	private static final int height = 600;	//Window dimensions
-	private static final int width = 900;
-	private static int[][] wordBoundsX= new int[][] {
+	private final int height = 600;	//Window dimensions
+	private final int width = 900;
+	private int[][] wordBoundsX= new int[][] {
 		{610-5,200+10}, {500-5,395+9}, {560-5,300+10}
 	};//Order: SMASH, How to play, settings
-	private static int[][] wordBoundsY = new int[][] {
+	private int[][] wordBoundsY = new int[][] {
 		{240-5, 40+10},{340-5,40+10},{440-5,40+10}
 	};
-	
+	private boolean closed = false;
 	private Image backgroundImg  = Toolkit.getDefaultToolkit().createImage("betterIntroScreen.jpg").getScaledInstance(width, height,java.awt.Image.SCALE_SMOOTH);
 	private Image smashImg  = Toolkit.getDefaultToolkit().createImage("SMASH.png").getScaledInstance(200, 40,java.awt.Image.SCALE_SMOOTH);
 	private Image howToPlayImg  = Toolkit.getDefaultToolkit().createImage("HOWTOPLAY.png").getScaledInstance(395, 40,java.awt.Image.SCALE_SMOOTH);
@@ -57,11 +57,12 @@ public class mainMenu implements KeyListener {	//KeyListener is like ActionListe
 		Thread updateMenu = new Thread(new Runnable() {	//The main loop
 			public void run() {	
 
-				while (true) {	
+				while (!closed) {	
 					frame.repaint();	//Refresh frame and panel
 					panel.repaint();
 					try {Thread.sleep(17);} catch (Exception ex) {}	//10 millisecond delay between each refresh
 				}
+				frame.dispose();
 			}
 		});	
 		updateMenu.start();	//Start the main loop
@@ -92,6 +93,7 @@ public class mainMenu implements KeyListener {	//KeyListener is like ActionListe
 			setDrawnSelection();
 		}
 		else if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+			closed = true;
 			if(currentSelection==0)new ChooseCharacterMenu();
 			else if(currentSelection==1) ;
 			else if(currentSelection==2) ;
