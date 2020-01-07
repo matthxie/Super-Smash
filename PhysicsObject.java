@@ -7,6 +7,8 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 
 public class PhysicsObject extends JPanel {
+	private int playerNumber;
+	
 	private int numDeath;
 	private boolean deadRightNow = false;
 	private long tempTime;
@@ -39,12 +41,15 @@ public class PhysicsObject extends JPanel {
 	private int orientation;	//Which way the player is facing
 
 	private double damagePercentage;	//Damage percentage of the player, decides how far the player flies when hit
+	private double damageTaken;	
 
 	private PhysicsObject hitObject;	//Stores the player object that has been hit by this player object
 
 	private Image img;	//The image used for this player object
 
-	public PhysicsObject(String file, String weaponName, boolean melee, int x, int y, int width, int height, double mass, int runSpeed) {
+	public PhysicsObject(int playerNumber, String file, String weaponName, boolean melee, int x, int y, int width, int height, double mass, int runSpeed) {
+		this.playerNumber = playerNumber;
+		
 		this.objectW = width;
 		this.objectH = height;
 
@@ -76,6 +81,7 @@ public class PhysicsObject extends JPanel {
 		this.orientation = -1;
 
 		this.damagePercentage = 0;
+		this.damageTaken = 0;
 
 		try { this.img = ImageIO.read(new File(file));
 		img = img.getScaledInstance(objectW, objectH, Image.SCALE_SMOOTH); 
@@ -86,7 +92,7 @@ public class PhysicsObject extends JPanel {
 		Graphics2D gg = (Graphics2D) g;
 		
 		if(!deadRightNow) {
-			if(this.lastX > Physics.width || this.lastX < 0 || this.lastY > Physics.height) {
+			if(this.lastX > Physics.width+50 || this.lastX < -50 || this.lastY > Physics.height+20) {
 				this.numDeath++;
 				tempTime = System.currentTimeMillis();
 				deadRightNow=true;
@@ -170,10 +176,16 @@ public class PhysicsObject extends JPanel {
 				}
 			}
 			
+			if(playerNumber == 1) gg.setColor(Color.red);
+			else gg.setColor(Color.blue);
+			
+			damagePercentage = Math.round(((damageTaken/2.0)*100)*100)/100;
+			
 			gg.setFont(new Font("Comic Sans MS", Font.BOLD, 15));
-			gg.setColor(Color.red);
+			
 			gg.drawImage(img, lastX, lastY, null);
-			gg.drawString(Double.toString(Math.round(damagePercentage*100)/100)+"%", lastX, lastY-5);
+			gg.drawString(Long.toString(Math.round(((damageTaken/2.0)*100)*100)/100)+"%", lastX, lastY-5);
+			gg.drawString("Player " + playerNumber, lastX, lastY-30);
 		}
 		else if(numDeath > 3) {
 			Physics.paused = true;
@@ -192,9 +204,10 @@ public class PhysicsObject extends JPanel {
 			lastX = ThreadLocalRandom.current().nextInt(100, 750 + 1);
 			lastY = 0;
 
-			damagePercentage = 0;
+			damageTaken = 0;
 			moveSpeed = 0;
 			fallSpeed = 0;
+			fallingTime = 0;
 			falling = true;
 			numDeath++;
 			deadRightNow = false;
@@ -214,7 +227,7 @@ public class PhysicsObject extends JPanel {
 		else friction = true;	//Friction comes in after the user releases the move key
 	}
 
-	public void moveY(double dy) {	//Same thing as moveSpeed, but with fallSpeed in there for gravity
+	public void moveY(double dy) {	//Same thing as moveX, but with fallSpeed and fallingTime since this is vertical movement
 		if(dy < 0) {
 			numJumps++;
 			fallingTime = 1;
@@ -253,9 +266,9 @@ public class PhysicsObject extends JPanel {
 	}
 
 	public void dealDamage(double damage, int orientation, PhysicsObject o) {	//Deal damage the object that has been hit
-		o.moveSpeed += (o.damagePercentage*damage) * this.orientation;	//Push object right
-		o.fallSpeed -= (1.5*o.damagePercentage*damage);	//Push object up 
-		o.damagePercentage += damage;	//Add to other player's damage percentage
+		o.moveSpeed += ((o.damagePercentage/3)*damage) * this.orientation;	//Push object right
+		o.fallSpeed -= (1.5*(o.damagePercentage/3)*damage);	//Push object up 
+		o.damageTaken += damage;	//Add to other player's damage percentage
 	}
 
 	Image flip(BufferedImage sprite, boolean player) {	//Flip image in parameter, then return it
@@ -301,7 +314,7 @@ public class PhysicsObject extends JPanel {
 	}
 
 	public void swingWeapon() {
-		if(!melee) Physics.projectileList.add(new ProjectileWeapon(Physics.fireball, this, lastX-(objectW/2), lastY+(objectH/8), 50, 30, 4, 0.5, 10, orientation));
+		if(!melee) Physics.projectileList.add(new ProjectileWeapon(Physics.fireball, this, lastX-(objectW/2), lastY+(objectH/8), 50, 30, 4, 0.2, 10, orientation));
 		else swingWeapon = true;
 	}
 
@@ -319,6 +332,6 @@ public class PhysicsObject extends JPanel {
 		else moveSpeed = 0;
 	}
 	public double getDamagePercentage() {
-		return damagePercentage;
+		return damageTaken;
 	}
 }
