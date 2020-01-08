@@ -16,10 +16,15 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 
 	public static boolean paused = false;
 	public static boolean quit = false;
+	
+	public static boolean P1IsShooting = false;
+	public static boolean P2IsShooting = false;
 
 	public static Image backgroundImage = Toolkit.getDefaultToolkit().createImage("better.jpg").getScaledInstance(width, height,java.awt.Image.SCALE_SMOOTH);
 	public static Image fireball = Toolkit.getDefaultToolkit().createImage("fireball.png");
 	public static Image sword = Toolkit.getDefaultToolkit().createImage("sword.png");
+	public static Image hand = Toolkit.getDefaultToolkit().createImage("hand.png");
+	public static Image steam = Toolkit.getDefaultToolkit().createImage("steam.png");
 
 	public static JFrame frame;
 	public static JPanel panel = new canvas();	//canvas is a method which creates a panel that you can "draw" objects onto
@@ -33,21 +38,25 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 
 		panel.setLayout(null);
 
-		physicsObjectList.add(new PhysicsObject(1, "yoshi.png", "sword.png", true, ThreadLocalRandom.current().nextInt(100, 300 + 1), 100, 30, 40, 33.3, 10));
+		physicsObjectList.add(new PhysicsObject(1, "yoshi.png", "sword.png", false, ThreadLocalRandom.current().nextInt(100, 300 + 1), 100, 30, 40, 33.3, 10));
 		physicsObjectList.add(new PhysicsObject(2, "yoshi.png", "sword.png", false, ThreadLocalRandom.current().nextInt(550, 750 + 1), 100, 30, 40, 33.3, 20));
 
-		platformList.add(new Platform(400, 92 ,101, 5));
-		platformList.add(new Platform(280, 170 ,102, 5));
-		platformList.add(new Platform(519, 170 ,102, 5));
-		platformList.add(new Platform(400, 245 ,101, 5));
-		platformList.add(new Platform(158, 245 ,107, 5));
-		platformList.add(new Platform(637, 245 ,105, 5));
-		platformList.add(new Platform(90, 315 ,710, 15));
+		platformList.add(new Platform(400, 92 ,101, 15, false, true));
+		platformList.add(new Platform(280, 170 ,102, 15, false, true));
+		platformList.add(new Platform(519, 170 ,102, 15, false, true));
+		platformList.add(new Platform(400, 245 ,101, 15, false, true));
+		platformList.add(new Platform(158, 245 ,107, 15, false, true));
+		platformList.add(new Platform(637, 245 ,105, 15, false, true));
+		platformList.add(new Platform(90, 315 ,710, 25, false, true));
+		
+		platformList.add(new Platform(30, 350, 60, 25, true, true));
+		platformList.add(new Platform(800, 350, 60, 25, true, false));
 
 		frame.add(panel);
 
 		frame.setLocationRelativeTo(null);	//Make the frame visible
 		frame.setVisible(true);
+		
 		Thread closeThread = new Thread(new Runnable() {
 			public void run() {
 				while(!quit) {
@@ -61,6 +70,9 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 			public void run() {	
 				while(!quit) {
 					while (!paused) {
+						if(P1IsShooting) physicsObjectList.get(0).swingWeapon();
+						if(P2IsShooting) physicsObjectList.get(1).swingWeapon();
+						
 						frame.repaint();	//Refresh frame and panel
 						panel.repaint();
 						try {Thread.sleep(17);} catch (Exception ex) {}	//10 millisecond delay between each refresh
@@ -88,30 +100,31 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 	public void keyPressed(KeyEvent e) {	//When the keys are pressed (when they're released is the method after this one)
 		//Arrow keys for object1
 		if(e.getKeyCode() == KeyEvent.VK_RIGHT) physicsObjectList.get(0).moveX(4);	// "VK_RIGHT" --> Right arrow 
-		else if(e.getKeyCode() == KeyEvent.VK_LEFT) physicsObjectList.get(0).moveX(-4);	//Get the first object from physicsObjectList, positive X moves right
+		if(e.getKeyCode() == KeyEvent.VK_LEFT) physicsObjectList.get(0).moveX(-4);	//Get the first object from physicsObjectList, positive X moves right
 
 		if(e.getKeyCode() == KeyEvent.VK_UP) {
 			if(physicsObjectList.get(0).getNumJumps()<=1) physicsObjectList.get(0).moveY(-10);	//Negative Y moves up
 		}
 
-		if(e.getKeyCode() == KeyEvent.VK_COMMA)	//Attack animation
-			physicsObjectList.get(0).swingWeapon();
+		if(e.getKeyCode() == KeyEvent.VK_COMMA)	P1IsShooting = true;
+			
 
 		//WASD for object2
 		if(e.getKeyCode() == KeyEvent.VK_D) physicsObjectList.get(1).moveX(4);	//"VK_*LETTER*" --> "D" key
-		else if(e.getKeyCode() == KeyEvent.VK_A) physicsObjectList.get(1).moveX(-4);	//physicsObjectList.get(1): gets second obejct (the only two are the boxes)
+		if(e.getKeyCode() == KeyEvent.VK_A) physicsObjectList.get(1).moveX(-4);	//physicsObjectList.get(1): gets second obejct (the only two are the boxes)
 
 		if(e.getKeyCode() == KeyEvent.VK_W) {
 			if(physicsObjectList.get(1).getNumJumps()<=1) physicsObjectList.get(1).moveY(-10);
 		}
 
-		if(e.getKeyCode() == KeyEvent.VK_X) 	//Attack animation
-			physicsObjectList.get(1).swingWeapon();
+		if(e.getKeyCode() == KeyEvent.VK_X) P2IsShooting = true;
 	}
 
 	public void keyReleased(KeyEvent e) {	//When the keys are released
 		if(e.getKeyCode() == KeyEvent.VK_LEFT || e.getKeyCode() == KeyEvent.VK_RIGHT) physicsObjectList.get(0).moveX(0); //Object1
 		if(e.getKeyCode() == KeyEvent.VK_A || e.getKeyCode() == KeyEvent.VK_D) physicsObjectList.get(1).moveX(0); //Object2
+		if(e.getKeyCode() == KeyEvent.VK_COMMA)	P1IsShooting = false;
+		if(e.getKeyCode() == KeyEvent.VK_X) P2IsShooting = false;
 	}
 
 	public static class canvas extends JPanel {	//Make a new JPanel which unlike regular JPanels you can draw objects onto 
@@ -137,7 +150,7 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 				}
 			}
 
-			for(int j=0; j<weaponList.size(); j++)	//Draw contents in weaponList
+			for(int j=0; j<weaponList.size(); j++)	//Draw objects in weaponList
 				weaponList.get(j).draw(g);
 		}
 	}
