@@ -17,7 +17,9 @@ public class PhysicsObject extends JPanel {
 	private int objectH;
 
 	private int lastX;	//Current X value
-	private int lastY;	//Current Y value
+	private int lastY;	//Current Y value7
+	
+	private boolean hanging;
 	
 	private double mass;
 	private int runSpeed;
@@ -49,12 +51,14 @@ public class PhysicsObject extends JPanel {
 
 	public PhysicsObject(int playerNumber, String file, String weaponName, boolean melee, int x, int y, int width, int height, double mass, int runSpeed) {
 		this.playerNumber = playerNumber;
-		
+				
 		this.objectW = width;
 		this.objectH = height;
 
 		this.lastX = x;
 		this.lastY = y;
+		
+		this.hanging = false;
 		
 		this.mass = mass;
 		this.runSpeed = runSpeed;
@@ -106,7 +110,7 @@ public class PhysicsObject extends JPanel {
 				}
 			}
 
-			if(platformCollision() || objectCollision(lastX, lastY, false)) {	//Object will fall if not standing on platform or collision
+			if(platformCollision() || objectCollision(lastX, lastY, false) || hanging) {	//Object will fall if not standing on platform or collision
 				if(fallSpeed > 0) {
 					falling = false;	//Stop falling if on a platform
 					fallingTime = 1;	//Reset the fallingTime (has to be always at least 1, otherwise would start at a lower falling speed)
@@ -114,7 +118,9 @@ public class PhysicsObject extends JPanel {
 				}
 				else falling = true;
 			}
-			else falling = true;	//Fall if not on ground
+			else {
+				falling = true;	//Fall if not on ground
+			}
 
 			if(falling) lastY += fallSpeed * fallingTime;	//Fall only if falling boolean says true, fallingTime is a modifier
 
@@ -180,7 +186,7 @@ public class PhysicsObject extends JPanel {
 			else gg.setColor(Color.blue);
 			
 			damagePercentage = Math.round(((damageTaken/2.0)*100)*100)/100;
-			
+						
 			gg.setFont(new Font("Comic Sans MS", Font.BOLD, 15));
 			
 			gg.drawImage(img, lastX, lastY, null);
@@ -215,7 +221,7 @@ public class PhysicsObject extends JPanel {
 	}
 
 	public void moveX(double dx) {	//Increase moveSpeed, which is how much the object moves with each refresh (0 means not moving)
-		if(dx != 0) {
+		if(dx != 0 && !hanging) {
 			friction = false;	//No friction while user is pressing the move key
 			moveSpeed = dx;
 
@@ -229,6 +235,7 @@ public class PhysicsObject extends JPanel {
 
 	public void moveY(double dy) {	//Same thing as moveX, but with fallSpeed and fallingTime since this is vertical movement
 		if(dy < 0) {
+			hanging = false;
 			numJumps++;
 			fallingTime = 1;
 			fallSpeed = dy;
@@ -259,6 +266,13 @@ public class PhysicsObject extends JPanel {
 			Platform temp =Physics.platformList.get(i);
 			if((temp.topCorner) <= lastY+objectH && (temp.topCorner+temp.fatWise) >= lastY+objectH) 
 				if(temp.leftCorner <= lastX + objectW && temp.leftCorner+temp.longWise >= lastX) {
+					if(temp.getHanging() && fallSpeed>=0) {
+						hanging = true;
+						lastY = temp.getTopCornerY();
+						
+						if(!temp.getOrientation()) lastX = temp.getTopCornerX();
+						else lastX = temp.getTopCornerX()+temp.getLength();
+					}
 					return true;
 				}
 		}
@@ -269,6 +283,7 @@ public class PhysicsObject extends JPanel {
 		o.moveSpeed += ((o.damagePercentage/3)*damage) * this.orientation;	//Push object right
 		o.fallSpeed -= (1.5*(o.damagePercentage/3)*damage);	//Push object up 
 		o.damageTaken += damage;	//Add to other player's damage percentage
+		o.hanging = false;
 	}
 
 	Image flip(BufferedImage sprite, boolean player) {	//Flip image in parameter, then return it
@@ -276,7 +291,7 @@ public class PhysicsObject extends JPanel {
 		else weapon.setFlipped();
 
 		BufferedImage img = new BufferedImage(sprite.getWidth(), sprite.getHeight(), BufferedImage.TYPE_INT_ARGB);
-		for(int i = sprite.getWidth()-1; i>0; i--) 
+		for(int i = sprite.getWidth()-1; i>0; i--)
 			for(int j=0; j<sprite.getHeight(); j++)
 				img.setRGB(sprite.getWidth()-i, j, sprite.getRGB(i, j));
 		return img;
@@ -331,6 +346,7 @@ public class PhysicsObject extends JPanel {
 		else if(speed > 0) moveSpeed = runSpeed;
 		else moveSpeed = 0;
 	}
+	
 	public double getDamagePercentage() {
 		return damageTaken;
 	}
