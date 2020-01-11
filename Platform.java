@@ -3,46 +3,61 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 
 public class Platform { //extends JPanel
-	int topCorner, leftCorner;
-	int longWise, fatWise;
+	private int topCornerY, topCornerX;
+	private int longWise, fatWise;
 	private boolean hanging, right;
-	
-	public Platform(int leftCorner, int topCorner, int longWise, int fatWise, boolean hanging, boolean right) {
-		this.topCorner = topCorner;
-		this.leftCorner = leftCorner;
+	private PhysicsObject occupant;
+
+	public Platform(int topCornerX, int topCornerY, int longWise, int fatWise, boolean hanging, boolean right) {
+		this.topCornerY = topCornerY;
+		this.topCornerX = topCornerX;
 		this.longWise = longWise;
 		this.fatWise = fatWise;
-		
+
 		this.hanging = hanging;
 		this.right = right;
+		
+		this.occupant = null;
 	}
-	
+
 	public Rectangle getBounds() {
-		return new Rectangle(this.leftCorner, this.topCorner, this.longWise, 1);
+		return new Rectangle(this.topCornerX, this.topCornerY, this.longWise, 1);
 	}
-	
+
 	public boolean getHanging() {
 		return hanging;
 	}
-	
+
 	public boolean getOrientation() {
 		return right;
 	}
 	
+	public void setOccupant(PhysicsObject o) {
+		occupant = o;
+	}
+	
+	public PhysicsObject getOccupant() {
+		return occupant;
+	}
+
 	public int getTopCornerX() {
-		return leftCorner;
+		return topCornerX;
 	}
-	
+
 	public int getTopCornerY() {
-		return topCorner;
+		return topCornerY;
 	}
-	
+
 	public int getLength() {
 		return longWise;
 	}
 	
+	public int getThickness() {
+		return fatWise;
+	}
+
 	public void draw(Graphics g) {
 		Graphics2D gg = (Graphics2D) g;		
-		gg.fillRect(leftCorner, topCorner, longWise, fatWise);
+		gg.fillRect(topCornerX, topCornerY, longWise, fatWise);
 	}
 }
