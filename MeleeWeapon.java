@@ -54,7 +54,6 @@ public class MeleeWeapon {
 		
 		if(flipped == 235) gg.drawImage(img, lastX+145, lastY-155, weaponW, weaponH, null);
 		else gg.drawImage(img, lastX, lastY, weaponW, weaponH, null);
-		
 		at.setToIdentity();
 	}
 
