@@ -1,68 +1,61 @@
 import java.awt.*;
-import java.awt.geom.AffineTransform;
-import java.io.File;
-import java.io.IOException;
 
-import javax.imageio.ImageIO;
-
-public class MeleeWeapon {
+public class ProjectileWeapon {
 	private Image img;
+	private PhysicsObject initializer;
 
 	private int lastX; 
 	private int lastY;
 	
-	private int weaponW;
-	private int weaponH;
-
-	private int angle;
-	private int flipped;
+	private int projectileW;
+	private int projectileH;
 	
 	private double speed;
 	private double damage;
 	private double mass;
-
-	public MeleeWeapon(String imgName, int x, int y, int width, int height, double speed, double damage, double mass) {
-		try { img = ImageIO.read(new File(imgName)); 
-		img = img.getScaledInstance(width, height, Image.SCALE_SMOOTH); 
-		} catch (IOException e) {}
-
+	
+	private int orientation;
+	
+	public ProjectileWeapon(Image img, PhysicsObject initializer, int x, int y, int width, int height, double speed, double damage, double mass, int orientation) {
+		this.img = img;
+		this.initializer = initializer;
+		
 		this.lastX = x;
 		this.lastY = y;
 		
-		this.weaponW = width;
-		this.weaponH = height;
+		this.projectileW = width;
+		this.projectileH = height;
 		
-		this.angle = 90;
-		this.flipped = 0;
-
 		this.speed = speed;
 		this.damage = damage; 
-		this.mass = mass;
+		this.mass = mass;		
+		
+		this.orientation = orientation;
 	}
 
 	public void draw(Graphics g) {
-		Graphics2D gg = (Graphics2D) g;	
+		Graphics2D gg = (Graphics2D) g;
+		gg.drawImage(img, lastX, lastY, projectileW, projectileH, null);
+	}
+
+	public boolean attack() {
+		if(orientation<0) this.lastX -= speed;
+		else this.lastX += speed;
 		
-		AffineTransform at = new AffineTransform();
-		if(flipped == 0) at.rotate(Math.toRadians(angle), lastX+weaponW, lastY+(90-angle));
-		else {
-			at.rotate(Math.toRadians(angle), lastX+weaponH+150, (lastY-weaponW)-145);
-			//at.translate(90, 80);
-		}
+		if(lastX < 0 || lastX > 900) return true;
+		return false;
+	}
 	
-		gg.setTransform(at);
-		
-		if(flipped == 235) gg.drawImage(img, lastX+145, lastY-155, weaponW, weaponH, null);
-		else gg.drawImage(img, lastX, lastY, weaponW, weaponH, null);
-		at.setToIdentity();
+	public int getX() {
+		return lastX;
 	}
-
-	public void setX(int x) {
-		lastX = x;
+	
+	public int getY() {
+		return lastY;
 	}
-
-	public void setY(int y) {
-		lastY = y;
+	
+	public PhysicsObject getOwner() {
+		return initializer;
 	}
 	
 	public void setImg(Image image) {
@@ -71,34 +64,6 @@ public class MeleeWeapon {
 	
 	public Image getImg() {
 		return img;
-	}
-	
-	public boolean swingDown() {
-		angle-=5;
-		if(angle <= 35+flipped) return true;
-		return false;
-	}
-	
-	public boolean swingUp() {
-		angle+=5;
-		if(angle >= 90+flipped) return true;
-		return false;
-	}
-	
-	public void setFlipped() {
-		if(flipped == 235) {
-			flipped = 0;
-			angle = 90;
-		}
-		else {
-			flipped = 235;
-			angle = 270;
-		}
-	}
-	
-	public boolean getFlipped() {
-		if(flipped == 235) return true;
-		else return false;
 	}
 	
 	public double getDamage() {
