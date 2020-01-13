@@ -39,7 +39,7 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 
 		panel.setLayout(null);
 
-		physicsObjectList.add(new PhysicsObject(1, "yoshi.png", "sword.png", false, ThreadLocalRandom.current().nextInt(100, 300 + 1), 100, 30, 40, 33.3, 10));
+		physicsObjectList.add(new PhysicsObject(1, "yoshi.png", "sword.png", true, ThreadLocalRandom.current().nextInt(100, 300 + 1), 100, 30, 40, 33.3, 10));
 		physicsObjectList.add(new PhysicsObject(2, "yoshi.png", "sword.png", false, ThreadLocalRandom.current().nextInt(550, 750 + 1), 100, 30, 40, 33.3, 20));
 
 		platformList.add(new Platform(400, 92 ,101, 15, false, true));
@@ -59,6 +59,7 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 			imageMap.put("hand", ImageIO.read(new File("hand.png")));
 			imageMap.put("handFlipped", toBufferedImage(flip(ImageIO.read(new File("hand.png")))));
 			imageMap.put("steam", ImageIO.read(new File("steam.png")));
+			imageMap.put("yoshi", toBufferedImage(ImageIO.read(new File("yoshi.png")).getScaledInstance(40, 50, Image.SCALE_SMOOTH)));
 		} catch(IOException e) {}
 
 		frame.add(panel);
