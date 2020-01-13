@@ -7,21 +7,43 @@ import java.io.IOException;
 public class ChooseCharacterMenu implements KeyListener {	//KeyListener is like ActionListener but for keyboard
 	private int rectX,rectY,rectWidth,rectHeight;
 	private int playerNumber = 1;
-	private Font font = null;
+	private Font font = null,fontSmaller=null;
 	private int currentSelection = 0;
-	private String playerOne,playerTwo;
-	private String[] characterList = new String[] {"Mario", "Donkey Kong", "Link", "Samus", "Yoshi", "Kirby", "Fox", "Pikachu"};
 	private final int height = 600;	//Window dimensions
 	private final int width = 900;
 	private Image chooseCharImage  = Toolkit.getDefaultToolkit().createImage("betterSmashChoose.png").getScaledInstance(width, height,java.awt.Image.SCALE_SMOOTH);
-
 	private int[][] imageBoundsX= new int[][] {
 		{97,140,0}, {238,141,0}, {379,141,0}, {521,141,0},{662,141,0}, {167,141,0}, {309,141,0}, {450,141,0}, {591, 143,0}
 	};//Order: Mario, Donkey Kong, Link, Samus, Yoshi, Kirby, Fox, Pikachu, Random
 	private int[][] imageBoundsY = new int[][] {
 		{84, 121},{84,121},{84,121},{84,121},{84,121}, {206,122}, {206,122}, {206, 122}, {206,123}
 	};//Order: Mario, Donkey Kong, Link, Samus, Yoshi, Kirby, Fox, Pikachu, Random
+	private Image[] p1images = new Image[] {
+			Toolkit.getDefaultToolkit().createImage("p1ScreenMario.png"),
+			Toolkit.getDefaultToolkit().createImage("p1ScreenDonkey.png"),
+			Toolkit.getDefaultToolkit().createImage("p1ScreenLink.png"),
+ 			Toolkit.getDefaultToolkit().createImage("p1ScreenSamus.png"),
+			Toolkit.getDefaultToolkit().createImage("p1ScreenYoshi.png"),
+			Toolkit.getDefaultToolkit().createImage("p1ScreenKirby.png"),
+			Toolkit.getDefaultToolkit().createImage("p1ScreenFox.png"),
+			Toolkit.getDefaultToolkit().createImage("p1ScreenPikachu.png"),
+			Toolkit.getDefaultToolkit().createImage("p1Screen.png"),
 
+			
+	};
+	private Image[] p2images = new Image[] {
+			Toolkit.getDefaultToolkit().createImage("p2ScreenMario.png"),
+			Toolkit.getDefaultToolkit().createImage("p2ScreenDonkey.png"),
+			Toolkit.getDefaultToolkit().createImage("p2ScreenLink.png"),
+ 			Toolkit.getDefaultToolkit().createImage("p2ScreenSamus.png"),
+			Toolkit.getDefaultToolkit().createImage("p2ScreenYoshi.png"),
+			Toolkit.getDefaultToolkit().createImage("p2ScreenKirby.png"),
+			Toolkit.getDefaultToolkit().createImage("p2ScreenFox.png"),
+			Toolkit.getDefaultToolkit().createImage("p2ScreenPikachu.png"),
+			Toolkit.getDefaultToolkit().createImage("p2Screen.png"),
+
+			
+	};
 	private JFrame frame;	
 	private JPanel panel = new canvas();	
 
@@ -36,7 +58,13 @@ public class ChooseCharacterMenu implements KeyListener {	//KeyListener is like 
 		} catch (FontFormatException e) {
 		} catch (IOException e) {
 		}
+		try {
+			Font tempfont = Font.createFont(Font.TRUETYPE_FONT, fontFile);
+			fontSmaller = tempfont.deriveFont((float)(20));
 
+		} catch (FontFormatException e) {
+		} catch (IOException e) {
+		}
 		frame = new JFrame("Choose Your Character");	//Frame stuff
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(width, height);
@@ -60,14 +88,15 @@ public class ChooseCharacterMenu implements KeyListener {	//KeyListener is like 
 					try {Thread.sleep(17);} catch (Exception ex) {}	//10 millisecond delay between each refresh
 				}
 				new ChooseMapMenu();
+				frame.dispose();
 			}
 		});	
 		drawSquares.start();	//Start the main loop
 
 	}
-	public void setDrawnSelection() {
+	private void setDrawnSelection() {
 		rectX = imageBoundsX[currentSelection][0];
-		rectY = imageBoundsY[currentSelection][0];
+		rectY = imageBoundsY[currentSelection][0]-20;
 		rectWidth = imageBoundsX[currentSelection][1];
 		rectHeight = imageBoundsY[currentSelection][1];
 
@@ -97,26 +126,22 @@ public class ChooseCharacterMenu implements KeyListener {	//KeyListener is like 
 				else currentSelection = 1;
 
 			else if(e.getKeyCode() == KeyEvent.VK_LEFT)
-				if(currentSelection > 1) {
-					if(imageBoundsX[currentSelection-1][2]==0) {
+				if((currentSelection-1 >= 0 && imageBoundsX[currentSelection-1][2]==0)) {
 						currentSelection--;
-					}
-					else {
+				}
+				else if (currentSelection > 1){
 						currentSelection-=2;
 					}
-				}
 				else currentSelection = 8;
 
 			else if(e.getKeyCode()== KeyEvent.VK_ENTER) {
 
 				if(currentSelection == 8) randomPlayer();
 				else if(playerNumber == 1) {
-					playerOne = characterList[currentSelection];
 					imageBoundsX[currentSelection][2] = 1;
 
 				}
 				else if(playerNumber == 2) {
-					playerTwo = characterList[currentSelection];
 					imageBoundsX[currentSelection][2] = 2;
 				}
 				frame.repaint();	//Refresh frame and panel
@@ -141,11 +166,9 @@ public class ChooseCharacterMenu implements KeyListener {	//KeyListener is like 
 		System.out.println(tempSelect);
 
 		if(playerNumber == 1) {
-			playerOne = characterList[tempSelect];
 			imageBoundsX[tempSelect][2] = 1;
 		}
 		else if(playerNumber == 2) {
-			playerTwo = characterList[tempSelect];
 			imageBoundsX[tempSelect][2] = 2;
 		}
 
@@ -154,18 +177,6 @@ public class ChooseCharacterMenu implements KeyListener {	//KeyListener is like 
 	public void keyReleased(KeyEvent e) {
 		// TODO Auto-generated method stub
 
-	}
-	public void putImage(String img) {
-		ImageIcon icon = new ImageIcon(img);
-		Image image = icon.getImage().getScaledInstance((int)(icon.getIconWidth()/1.2),(int)(icon.getIconHeight()/1.2), java.awt.Image.SCALE_SMOOTH);
-		JLabel pic = new JLabel(new ImageIcon(image));
-		panel.add(pic);
-	}
-
-	public void clearAll() {
-		panel.removeAll();
-		panel.revalidate();
-		panel.repaint();
 	}
 
 	public static void main(String[] args) {	//Call the graphics constructor
@@ -177,19 +188,60 @@ public class ChooseCharacterMenu implements KeyListener {	//KeyListener is like 
 	public class canvas extends JPanel {	//Make a new JPanel that you can draw objects onto (Can't draw stuff anywhere you want onto normal JPanels)
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);	//Call paintComponent from the overlord JPanel
-
+			g.setColor(new Color(34,33,34));
+			g.fillRect(0, 0, width, height);
+			g.setColor(new Color(255,255,255));
 			g.setFont(font);
-			g.drawString("Player "+ playerNumber +" ChOose Your Character", 80, 40);
-			g.drawImage(chooseCharImage, 0, 0, null);
+			if(playerNumber == 1) {
+				g.drawString("Player 1 ChOose Your Character", 80, 40);
+			}
+			else g.drawString("Player 2 ChOose Your Character", 80, 40);
 
+//			g.drawString("Player 1:", 80, 380);
+			g.drawImage(chooseCharImage, 0, 0-20, null);
+		    g.drawImage(p1images[8], 0, 320,468,257, null);
+		   // g.drawImage(p2images[8], 468, 319,468,257, null);
+		    if(playerNumber == 1) {
+		    	g.drawImage(p1images[currentSelection], 0, 320,468,257, null);
+			    g.drawImage(p2images[8], 468, 319,468,257, null);
+		    }
+		    else {
+			    g.drawImage(p2images[currentSelection], 468, 319,468,257, null);
+
+		    }
+		    //g.drawImage(pickP1Image, 0-9,0-82,null);
 			for(int i = 0; i < imageBoundsX.length; i++) {
+				g.setFont(fontSmaller);
+				FontMetrics metrics = g.getFontMetrics(fontSmaller);
 				if(imageBoundsX[i][2] == 1) {
 					g.setColor(new Color(200,0,0));
-					g.fillRect(imageBoundsX[i][0], imageBoundsY[i][0], imageBoundsX[i][1], imageBoundsY[i][1]);
+					g.fillRect(imageBoundsX[i][0], imageBoundsY[i][0]-20, imageBoundsX[i][1], imageBoundsY[i][1]);
+					g.setColor(new Color(0,0,0));
+					g.drawRect(imageBoundsX[i][0], imageBoundsY[i][0]-20, imageBoundsX[i][1], imageBoundsY[i][1]);
+					g.drawRect(imageBoundsX[i][0]+1, imageBoundsY[i][0]-20+1, imageBoundsX[i][1]-2, imageBoundsY[i][1]-2);
+					g.drawRect(imageBoundsX[i][0]-1, imageBoundsY[i][0]-20-1, imageBoundsX[i][1]+2, imageBoundsY[i][1]+2);
+					// Determine the X coordinate for the text
+				    int x=imageBoundsX[i][0] + (imageBoundsX[i][1] - metrics.stringWidth("Player 1")) / 2;
+				    // Determine the Y coordinate for the text (note we add the ascent, as in java 2d 0 is top of the screen)
+				    int y = imageBoundsY[i][0]-20 + ((imageBoundsY[i][1] - metrics.getHeight()) / 2) + metrics.getAscent();
+				    g.setColor(new Color(255,255,255));
+				    g.drawString("Player 1", x, y);
+				    g.drawImage(p1images[i], 0, 320,468,257, null);
 				}
 				else if(imageBoundsX[i][2] == 2) {
 					g.setColor(new Color(0,0,200));
-					g.fillRect(imageBoundsX[i][0], imageBoundsY[i][0], imageBoundsX[i][1], imageBoundsY[i][1]);
+					g.fillRect(imageBoundsX[i][0], imageBoundsY[i][0]-20, imageBoundsX[i][1], imageBoundsY[i][1]);
+					g.setColor(new Color(0,0,0));
+					g.drawRect(imageBoundsX[i][0], imageBoundsY[i][0]-20, imageBoundsX[i][1], imageBoundsY[i][1]);
+					g.drawRect(imageBoundsX[i][0]+1, imageBoundsY[i][0]-20+1, imageBoundsX[i][1]-2, imageBoundsY[i][1]-2);
+					g.drawRect(imageBoundsX[i][0]-1, imageBoundsY[i][0]-1-20, imageBoundsX[i][1]+2, imageBoundsY[i][1]+2);
+					// Determine the X coordinate for the text
+				    int x = imageBoundsX[i][0] + (imageBoundsX[i][1] - metrics.stringWidth("Player 2")) / 2;
+				    // Determine the Y coordinate for the text (note we add the ascent, as in java 2d 0 is top of the screen)
+				    int y = imageBoundsY[i][0]-20 + ((imageBoundsY[i][1] - metrics.getHeight()) / 2) + metrics.getAscent();
+				    g.setColor(new Color(25,255,255));
+				    g.drawString("Player 2", x, y);	
+				    g.drawImage(p2images[i], 468, 319,468,257, null);
 				}
 			}
 			if(playerNumber ==1) {

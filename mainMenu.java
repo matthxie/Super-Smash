@@ -10,7 +10,6 @@ import java.io.IOException;
 
 public class mainMenu implements KeyListener {	//KeyListener is like ActionListener but for keyboard
 	private int rectX,rectY,rectWidth,rectHeight;
-	private Font font = null;
 	private int currentSelection = 0;
 	private final int height = 600;	//Window dimensions
 	private final int width = 900;
@@ -30,17 +29,8 @@ public class mainMenu implements KeyListener {	//KeyListener is like ActionListe
 	private JPanel panel = new canvas();	
 
 	public mainMenu() {
-		String fName = "superFont.ttf";
-		File fontFile = new File(fName);		
-		new JLabel();
+		
 		setDrawnSelection();
-		try {
-			Font tempfont = Font.createFont(Font.TRUETYPE_FONT, fontFile);
-			font = tempfont.deriveFont((float)(40));
-
-		} catch (FontFormatException e) {
-		} catch (IOException e) {
-		}
 
 		frame = new JFrame("Super Smash");	//Frame stuff
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -68,7 +58,7 @@ public class mainMenu implements KeyListener {	//KeyListener is like ActionListe
 		updateMenu.start();	//Start the main loop
 
 	}
-	public void setDrawnSelection() {
+	private void setDrawnSelection() {
 		rectX = wordBoundsX[currentSelection][0];
 		rectY = wordBoundsY[currentSelection][0];
 		rectWidth = wordBoundsX[currentSelection][1];
@@ -95,7 +85,7 @@ public class mainMenu implements KeyListener {	//KeyListener is like ActionListe
 		else if(e.getKeyCode() == KeyEvent.VK_ENTER) {
 			closed = true;
 			if(currentSelection==0)new ChooseCharacterMenu();
-			else if(currentSelection==1) ;
+			else if(currentSelection==1) new HowToPlayMenu();
 			else if(currentSelection==2) ;
 			else System.out.println("Houston we have a problem with the selection");
 		}
@@ -105,20 +95,6 @@ public class mainMenu implements KeyListener {	//KeyListener is like ActionListe
 	
 	@Override
 	public void keyReleased(KeyEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-	public void putImage(String img) {
-		ImageIcon icon = new ImageIcon(img);
-		Image image = icon.getImage().getScaledInstance((int)(icon.getIconWidth()/1.2),(int)(icon.getIconHeight()/1.2), java.awt.Image.SCALE_SMOOTH);
-		JLabel pic = new JLabel(new ImageIcon(image));
-		panel.add(pic);
-	}
-
-	public void clearAll() {
-		panel.removeAll();
-		panel.revalidate();
-		panel.repaint();
 	}
 
 	public static void main(String[] args) {	//Call the graphics constructor

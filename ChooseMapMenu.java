@@ -6,26 +6,41 @@ import java.io.File;
 import java.io.IOException;
 
 public class ChooseMapMenu implements KeyListener {	//KeyListener is like ActionListener but for keyboard
-	private int rectX=300,rectY=100,rectWidth=300,rectHeight=200;
+	private int rectX=300,rectY=150,rectWidth=300,rectHeight=200;
 	private int currentSelection = 0;
 	private int nextSelection = 1;
 	private int prevSelection = 5;
 	private int nextNextSelection=2;
 	private int prevPrevSelection=4;
-	private final int height = 600;	//Window dimensions
-	private final int width = 900;
+	private boolean onSettings = false;
+	private final static int height = 600;	//Window dimensions
+	private final static int width = 900;
 	private Font font = null;
-//CENTER OF SCREEN IS 450
-	private JFrame frame;	
-	private JPanel panel = new canvas();	
+	private final Image redCircle = Toolkit.getDefaultToolkit().createImage("redCircle.png").getScaledInstance(56, 56, java.awt.Image.SCALE_SMOOTH);
 
+	private final Image settingsIcon = Toolkit.getDefaultToolkit().createImage("settingsIcon.png").getScaledInstance(50, 50, java.awt.Image.SCALE_SMOOTH);
+	private final Image starImage = Toolkit.getDefaultToolkit().createImage("superSmashDifficultyStars.png").getScaledInstance(50, 50, java.awt.Image.SCALE_SMOOTH);
+	private boolean ended=false;
+	//CENTER OF SCREEN IS 450
+	public JFrame frame;	
+	private JPanel panel = new canvas();	
+	private static Map[] allMapArray = new Map[] {//Toolkit.getDefaultToolkit().createImage("FINALDESTINATION.png").getScaledInstance(width, height, java.awt.Image.SCALE_SMOOTH),
+			new Map(Toolkit.getDefaultToolkit().createImage("SMASHMAP0.png").getScaledInstance(width, height, java.awt.Image.SCALE_SMOOTH), new Platform[] {new Platform(140, 320 ,610, 5)}, 1, "FInAl DEstInAtIOn"),		
+			new Map(Toolkit.getDefaultToolkit().createImage("SMASHMAP1.png").getScaledInstance(width, height, java.awt.Image.SCALE_SMOOTH), new Platform[] {new Platform(388, 200 ,120, 5),new Platform(250, 290 ,120, 5),new Platform(530, 290 ,120, 5),new Platform(190, 370 ,525, 5)}, 1, "SUnrIsE"),		
+			new Map(Toolkit.getDefaultToolkit().createImage("SMASHMAP2.png").getScaledInstance(width, height, java.awt.Image.SCALE_SMOOTH), new Platform[] {new Platform(400, 92 ,101, 5),new Platform(280, 170 ,102, 5),new Platform(519, 170 ,102, 5),new Platform(400, 245 ,101, 5),new Platform(158, 245 ,107, 5),new Platform(637, 245 ,105, 5),new Platform(90, 315 ,710, 5)}, 2, "BIg BAttlEfIEld"),	
+			new Map(Toolkit.getDefaultToolkit().createImage("SMASHMAP3.png").getScaledInstance(width, height-20, java.awt.Image.SCALE_SMOOTH), new Platform[] {new Platform(535, 170 ,135, 5),new Platform(60, 420 ,770, 5)}, 2, "ArEnA FErOx"),		
+			new Map(Toolkit.getDefaultToolkit().createImage("SMASHMAP4.png").getScaledInstance(width, height-20, java.awt.Image.SCALE_SMOOTH), new Platform[] {new Platform(85, 220 ,160, 5),new Platform(30, 450 ,120, 5),new Platform(632, 255 ,268, 5),new Platform(405, 375 ,495, 5)}, 5, "SUzAkU CAstlE"),		
+			new Map(Toolkit.getDefaultToolkit().createImage("SMASHMAP5.png").getScaledInstance(width, height-20, java.awt.Image.SCALE_SMOOTH), new Platform[] {new Platform(65, 245 ,196, 5),new Platform(640, 245 ,196, 5),new Platform(194, 350 ,170, 5),new Platform(530, 345 ,172, 5),new Platform(324, 445 ,250, 5)}, 3, "NOrfAIr"),		
+
+	};
 	public ChooseMapMenu() {
+
 		frame = new JFrame("Choose Your Map");	//Frame stuff
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(width, height);
 		frame.setResizable(false);
 		frame.addKeyListener(this);
-		
+
 		String fName = "superFont.ttf";
 		File fontFile = new File(fName);		
 
@@ -46,11 +61,13 @@ public class ChooseMapMenu implements KeyListener {	//KeyListener is like Action
 		Thread drawSquares = new Thread(new Runnable() {	//The main loop
 			public void run() {	
 
-				while (true) {	
+				while (!ended) {	
 					frame.repaint();	//Refresh frame and panel
 					panel.repaint();
 					try {Thread.sleep(17);} catch (Exception ex) {}	//10 millisecond delay between each refresh
 				}
+				new Physics();
+				frame.dispose();
 
 			}
 		});	
@@ -65,41 +82,60 @@ public class ChooseMapMenu implements KeyListener {	//KeyListener is like Action
 
 	@Override
 	public void keyPressed(KeyEvent e) {
+		System.out.println(e.getKeyCode()+" "+KeyEvent.VK_ENTER);
 		if(e.getKeyCode() == KeyEvent.VK_RIGHT) {
-			if(currentSelection < 5) {
-				currentSelection++;
+			if(!onSettings) {
+				if(currentSelection < 5) {
+					currentSelection++;
+				}
+				else currentSelection = 0;
+				if(currentSelection < 5) {
+					nextSelection=currentSelection+1;
+				}else nextSelection=0;
+				if(currentSelection > 0)prevSelection = currentSelection-1;
+				else prevSelection = 5;
+				if(nextSelection+1<=5) {
+					nextNextSelection = nextSelection+1;
+				} else nextNextSelection =0;
+				if(prevSelection-1>=0) {
+					prevPrevSelection = prevSelection-1;
+				} else prevPrevSelection =5;
 			}
-			else currentSelection = 0;
-			if(currentSelection < 5) {
-				nextSelection=currentSelection+1;
-			}else nextSelection=0;
-			if(currentSelection > 0)prevSelection = currentSelection-1;
-			else prevSelection = 5;
-			if(nextSelection+1<=5) {
-				nextNextSelection = nextSelection+1;
-			} else nextNextSelection =0;
-			if(prevSelection-1>=0) {
-				prevPrevSelection = prevSelection-1;
-			} else prevPrevSelection =5;
+		}
+		else if(e.getKeyCode() == KeyEvent.VK_UP) {
+			onSettings = true;
+		}
+		else if(e.getKeyCode() == KeyEvent.VK_DOWN) {
+			onSettings = false;
 		}
 		else if(e.getKeyCode() == KeyEvent.VK_LEFT) {
-			if(currentSelection > 0) 
-				currentSelection--;
-			else currentSelection = 5;
-			if(currentSelection < 5) {
-				nextSelection=currentSelection+1;
-			}else nextSelection=0;
-			if(currentSelection > 0)prevSelection = currentSelection-1;
-			else prevSelection = 5;
-			if(nextSelection+1<=5) {
-				nextNextSelection = nextSelection+1;
-			} else nextNextSelection =0;
-			if(prevSelection-1>=0) {
-				prevPrevSelection = prevSelection-1;
-			} else prevPrevSelection =5;
+			if(!onSettings) {
+				if(currentSelection > 0) 
+					currentSelection--;
+				else currentSelection = 5;
+				if(currentSelection < 5) {
+					nextSelection=currentSelection+1;
+				}else nextSelection=0;
+				if(currentSelection > 0)prevSelection = currentSelection-1;
+				else prevSelection = 5;
+				if(nextSelection+1<=5) {
+					nextNextSelection = nextSelection+1;
+				} else nextNextSelection =0;
+				if(prevSelection-1>=0) {
+					prevPrevSelection = prevSelection-1;
+				} else prevPrevSelection =5;
+			}
+			
 		}
 		else if(e.getKeyCode()== KeyEvent.VK_ENTER) {
-
+			if(!onSettings) {
+				Physics.currentMap=allMapArray[currentSelection];
+				ended=true;
+			}
+			else {
+				new mapSettings();
+				frame.dispose();
+			}
 		}
 
 	}
@@ -109,12 +145,7 @@ public class ChooseMapMenu implements KeyListener {	//KeyListener is like Action
 		// TODO Auto-generated method stub
 
 	}
-	public void putImage(String img) {
-		ImageIcon icon = new ImageIcon(img);
-		Image image = icon.getImage().getScaledInstance((int)(icon.getIconWidth()/1.2),(int)(icon.getIconHeight()/1.2), java.awt.Image.SCALE_SMOOTH);
-		JLabel pic = new JLabel(new ImageIcon(image));
-		panel.add(pic);
-	}
+
 
 	public void clearAll() {
 		panel.removeAll();
@@ -131,8 +162,12 @@ public class ChooseMapMenu implements KeyListener {	//KeyListener is like Action
 	public class canvas extends JPanel {	//Make a new JPanel that you can draw objects onto (Can't draw stuff anywhere you want onto normal JPanels)
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);	//Call paintComponent from the overlord JPanel
+			FontMetrics metrics = g.getFontMetrics(font);
+			g.setColor(new Color(34,33,34));
 			g.fillRect(0, 0, width, height);
-
+			g.setFont(font);
+			g.setColor(new Color(255,255,255));
+			g.drawString("ChoOse Your Map", 250, rectY-40);
 			BufferedImage img = new BufferedImage((int)(rectWidth/1.5), (int)(rectHeight/1.5),BufferedImage.TYPE_INT_ARGB);
 			Graphics2D g2 = img.createGraphics();
 			g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
@@ -142,7 +177,7 @@ public class ChooseMapMenu implements KeyListener {	//KeyListener is like Action
 			g2.setComposite(comp);
 			//				 physics2.allMapArray[nextSelection].draw(g2, rectX+250,rectY+35,(int)(rectWidth/1.5),(int)(rectHeight/1.5));
 
-			g2.drawImage(physics2.allMapArray[nextSelection].getBack(), 0, 0,(int)(rectWidth/1.5), (int)(rectHeight/1.5),null);
+			g2.drawImage(allMapArray[nextSelection].getBack(), 0, 0,(int)(rectWidth/1.5), (int)(rectHeight/1.5),null);
 			g.drawImage(img, rectX+250, rectY+35, null);
 
 			BufferedImage img1 = new BufferedImage((int)(rectWidth/1.5), (int)(rectHeight/1.5),BufferedImage.TYPE_INT_ARGB);
@@ -153,55 +188,69 @@ public class ChooseMapMenu implements KeyListener {	//KeyListener is like Action
 			Composite comp2 = AlphaComposite.getInstance(rule2 , (float) 0.6 );
 			g3.setComposite(comp2);
 
-			g3.drawImage(physics2.allMapArray[prevSelection].getBack(), 0, 0,(int)(rectWidth/1.5), (int)(rectHeight/1.5),null);
+			g3.drawImage(allMapArray[prevSelection].getBack(), 0, 0,(int)(rectWidth/1.5), (int)(rectHeight/1.5),null);
 			g.drawImage(img1, rectX-150, rectY+35, null);
 
-			
+
 			BufferedImage img2 = new BufferedImage((int)(rectWidth/1.8)-65, (int)(rectHeight/1.8),BufferedImage.TYPE_INT_ARGB);
 			Graphics2D g4 = img2.createGraphics();
 			g4.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 					RenderingHints.VALUE_ANTIALIAS_ON);
 			int rule3 = AlphaComposite.SRC_OVER;
-			Composite comp3 = AlphaComposite.getInstance(rule3 , (float) 0.2 );
+			Composite comp3 = AlphaComposite.getInstance(rule3 , (float) 0.3 );
 			g4.setComposite(comp3);
 
-			g4.drawImage(physics2.allMapArray[prevPrevSelection].getBack(), 0, 0,(int)(rectWidth/1.8), (int)(rectHeight/1.8),null);
+			g4.drawImage(allMapArray[prevPrevSelection].getBack(), 0, 0,(int)(rectWidth/1.8), (int)(rectHeight/1.8),null);
 			g.drawImage(img2, rectX-250, rectY+45, null);
 
 
-			
 			BufferedImage img3 = new BufferedImage((int)(rectWidth/1.8)-65, (int)(rectHeight/1.8),BufferedImage.TYPE_INT_ARGB);
 			Graphics2D g5 = img3.createGraphics();
 			g5.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 					RenderingHints.VALUE_ANTIALIAS_ON);
 			int rule4 = AlphaComposite.SRC_OVER;
-			Composite comp4 = AlphaComposite.getInstance(rule4 , (float) 0.2 );
+			Composite comp4 = AlphaComposite.getInstance(rule4 , (float) 0.3 );
 			g5.setComposite(comp4);
 
-			g5.drawImage(physics2.allMapArray[nextNextSelection].getBack(), 0-65, 0,(int)(rectWidth/1.8), (int)(rectHeight/1.8),null);
+			g5.drawImage(allMapArray[nextNextSelection].getBack(), 0-65, 0,(int)(rectWidth/1.8), (int)(rectHeight/1.8),null);
 			g.drawImage(img3, rectX+450, rectY+45, null);
-
-
-//					    physics2.allMapArray[nextSelection].draw(g, rectX+250,rectY+35,(int)(rectWidth/1.5),(int)(rectHeight/1.5));
-//						physics2.allMapArray[prevSelection].draw(g, rectX-150,rectY+35,(int)(rectWidth/1.5),(int)(rectHeight/1.5));
 			g.setColor(new Color(0,0,0));
+
 			g.drawRect(rectX-150, rectY+35, (int)(rectWidth/1.5), (int)(rectHeight/1.5));
 			g.drawRect(rectX-150+1, rectY+35+1, (int)(rectWidth/1.5)-2, (int)(rectHeight/1.5)-2);
 			g.drawRect(rectX-150-1, rectY+35-1, (int)(rectWidth/1.5)+2, (int)(rectHeight/1.5)+2);
 			g.drawRect(rectX+250, rectY+35, (int)(rectWidth/1.5), (int)(rectHeight/1.5));
 			g.drawRect(rectX+250+1, rectY+35+1, (int)(rectWidth/1.5)-2, (int)(rectHeight/1.5)-2);
 			g.drawRect(rectX+250-1, rectY+35-1, (int)(rectWidth/1.5)+2, (int)(rectHeight/1.5)+2);
-			
-			physics2.allMapArray[currentSelection].draw(g, rectX,rectY,rectWidth,rectHeight);
+
+			allMapArray[currentSelection].draw(g, rectX,rectY,rectWidth,rectHeight);
+			if(!onSettings) {
+				g.setColor(new Color(255,0,0));
+			}
 			g.drawRect(rectX, rectY, rectWidth, rectHeight);
 			g.drawRect(rectX+1, rectY+1, rectWidth-2, rectHeight-2);
 			g.drawRect(rectX-1, rectY-1, rectWidth+2, rectHeight+2);
 
-			g.setFont(font);
 			g.setColor(new Color(255,255,255));
-			FontMetrics metrics = g.getFontMetrics(font);
-		    g.drawString(physics2.allMapArray[currentSelection].getTitle(), (int)((width - metrics.stringWidth(physics2.allMapArray[currentSelection].getTitle())) / 2), 350);
+			g.drawString(allMapArray[currentSelection].getTitle(), (int)((width - metrics.stringWidth(allMapArray[currentSelection].getTitle())) / 2), rectY+rectHeight+70);
+			BufferedImage difficultyStars = new BufferedImage(50*allMapArray[currentSelection].getDifficulty(), 50,BufferedImage.TYPE_INT_ARGB);
+			Graphics2D g6 = difficultyStars.createGraphics();
+			g6.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+					RenderingHints.VALUE_ANTIALIAS_ON);
+			int rule5 = AlphaComposite.SRC_OVER;
+			int x =0, y=0;
+			Composite comp5 = AlphaComposite.getInstance(rule5 , (float) 1 );
+			g6.setComposite(comp5);
+			for(int i = 0; i < allMapArray[currentSelection].getDifficulty(); i++) {
+				g6.drawImage(starImage, x, y,null);
+				x+=50;
+			}
+			g.drawImage(difficultyStars, (int)((900-difficultyStars.getWidth())/2), rectY+rectHeight+100, null);
+			g.drawImage(settingsIcon, 850, 0,null);
+			if(onSettings) {
+				g.drawImage(redCircle, 850-3, 0-3, null);
 
+			}
 		}
 	}
 }
