@@ -7,6 +7,7 @@ import javax.swing.*;
 
 public class PhysicsObject extends JPanel {
 	private int playerNumber;
+	private String characterName;
 
 	private int numDeath;
 	private boolean deadRightNow = false;
@@ -54,6 +55,7 @@ public class PhysicsObject extends JPanel {
 
 	public PhysicsObject(int playerNumber, String file, String weaponName, boolean melee, int x, int y, int width, int height, double mass, int runSpeed) {
 		this.playerNumber = playerNumber;
+		this.characterName = file.substring(0, file.length()-4);
 
 		this.objectW = width;
 		this.objectH = height;
@@ -194,17 +196,27 @@ public class PhysicsObject extends JPanel {
 
 			if(playerNumber == 1) gg.setColor(Color.red);
 			else gg.setColor(Color.blue);
+			gg.setFont(new Font("Comic Sans MS", Font.BOLD, 15));
 
 			if(hanging && !platform.getOrientation()) gg.drawImage(Physics.imageMap.get("hand"), lastX-objectW/2, lastY, 30, 30, null);
 			else if(hanging && platform.getOrientation()) gg.drawImage(Physics.imageMap.get("handFlipped"), lastX+objectW/3, lastY-objectH/4, 30, 30, null);
 
 			damagePercentage = Math.round(((damageTaken/2.0)*100)*100)/100;
 
-			gg.setFont(new Font("Comic Sans MS", Font.BOLD, 15));
-
 			gg.drawImage(img, lastX, lastY, null);
-			gg.drawString(Long.toString(Math.round(((damageTaken/2.0)*100)*100)/100)+"%", lastX, lastY-5);
-			gg.drawString("Player " + playerNumber, lastX, lastY-30);
+			
+			if(playerNumber == 1) {
+				gg.drawImage(Physics.imageMap.get(characterName), Physics.width-(600), Physics.height-70, null);
+				gg.drawString(Long.toString(Math.round(((damageTaken/2.0)*100)*100)/100)+"%", Physics.width-600, Physics.height-70);
+				gg.drawString(characterName, Physics.width-550, Physics.height-70);
+			}
+			else if(playerNumber == 2) {
+				gg.drawImage(Physics.imageMap.get(characterName), Physics.width-(300), Physics.height-70, null);
+				gg.drawString(Long.toString(Math.round(((damageTaken/2.0)*100)*100)/100)+"%", Physics.width-300, Physics.height-70);
+				gg.drawString(characterName, Physics.width-250, Physics.height-70);
+			}
+			
+			gg.drawString("Player " + playerNumber, lastX, lastY-10);
 		}
 		else if(numDeath > 3) {
 			Physics.paused = true;
@@ -233,7 +245,7 @@ public class PhysicsObject extends JPanel {
 		}
 	}
 
-	public void moveX(double dx) {	//Increase moveSpeed, which is how much the object moves with each refresh (0 means not moving)
+	public void moveX(double dx) {	//Horizontal movement
 		if(dx != 0 && !hanging) {
 			friction = false;	//No friction while user is pressing the move key
 			moveSpeed = dx;
@@ -251,7 +263,7 @@ public class PhysicsObject extends JPanel {
 		else friction = true;	//Friction comes in after the user releases the move key
 	}
 
-	public void moveY(double dy) {	//Same thing as moveX, but with fallSpeed and fallingTime since this is vertical movement
+	public void moveY(double dy) {	//Vertical movement
 		if(dy < 0) {
 			if(hanging) {
 				hangingPlatform.setOccupant(null);
@@ -286,13 +298,13 @@ public class PhysicsObject extends JPanel {
 
 	public boolean platformCollision() {	//Check if player object has come into contact with a platform
 		for(int i = 0; i < Physics.platformList.size(); i++) {
-			Platform temp = Physics.platformList.get(i);
+			Platform temp = Physics.platformList.get(i);	//Create a temporal Platform object 
 			if((temp.getTopCornerY()) <= lastY+objectH && (temp.getTopCornerY()+temp.getThickness()) >= lastY+objectH) 
 				if(temp.getTopCornerX() <= lastX + objectW && temp.getTopCornerX()+temp.getLength() >= lastX) {
 
-					platform = temp;
+					platform = temp;	//Set the current platform as the one being stepped on
 
-					if(temp.getHanging() && fallSpeed>=0 && temp.getOccupant()==null) {
+					if(temp.getHanging() && fallSpeed>=0 && temp.getOccupant()==null) { //Operations for if or if not someone else is hanging on
 						hanging = true;
 						moveSpeed = 0;
 						lastY = temp.getTopCornerY();
@@ -370,7 +382,7 @@ public class PhysicsObject extends JPanel {
 		else moveSpeed = 0;
 	}
 
-	public double getDamagePercentage() {
+	public double getDamageTaken() {
 		return damageTaken;
 	}
 }
