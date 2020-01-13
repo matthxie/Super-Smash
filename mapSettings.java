@@ -1,8 +1,6 @@
 import javax.swing.*;
-
 import java.awt.*;
 import java.awt.event.*;
-
 
 public class mapSettings implements KeyListener {	//KeyListener is like ActionListener but for keyboard
 	private int rectX,rectY,rectWidth,rectHeight;
@@ -12,17 +10,13 @@ public class mapSettings implements KeyListener {	//KeyListener is like ActionLi
 	
 	
 	private int[][] buttonBoundsX = {
-			
 			{238, 175}, 
 			{512, 175},
 			{238, 175}, 
 			{511, 175}, 
 			{373, 175}
-			
-
 	};
 	private int[][] buttonBoundsY = {
-			
 			{190, 69},
 			{191, 69},
 			{380, 69},
@@ -70,14 +64,10 @@ public class mapSettings implements KeyListener {	//KeyListener is like ActionLi
 		rectY = buttonBoundsY[currentSelection][0];
 		rectWidth = buttonBoundsX[currentSelection][1];
 		rectHeight = buttonBoundsY[currentSelection][1];
-
 	}
-	@Override
-	public void keyTyped(KeyEvent e) {
+	
+	public void keyTyped(KeyEvent e) {}
 
-	}
-
-	@Override
 	public void keyPressed(KeyEvent e) {
 		if(e.getKeyCode() == KeyEvent.VK_LEFT && currentSelection > 0) {
 			currentSelection--;
@@ -92,22 +82,17 @@ public class mapSettings implements KeyListener {	//KeyListener is like ActionLi
 				frame.dispose();
 				new ChooseMapMenu();
 				closed = true;
-				
 				;
 			}
 			
 		}
 	}
 
-	@Override
-	public void keyReleased(KeyEvent e) {
-	}
+	public void keyReleased(KeyEvent e) {}
 
 	public static void main(String[] args) {	//Call the graphics constructor
 		new mapSettings();
 	}
-
-
 
 	public class canvas extends JPanel {	//Make a new JPanel that you can draw objects onto (Can't draw stuff anywhere you want onto normal JPanels)
 		public void paintComponent(Graphics g) {

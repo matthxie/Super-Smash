@@ -2,11 +2,6 @@ import javax.swing.*;
 
 import java.awt.*;
 import java.awt.event.*;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.io.File;
-import java.io.IOException;
 
 public class mainMenu implements KeyListener {	//KeyListener is like ActionListener but for keyboard
 	private int rectX,rectY,rectWidth,rectHeight;
@@ -66,13 +61,10 @@ public class mainMenu implements KeyListener {	//KeyListener is like ActionListe
 
 	}
 
-
-	@Override
 	public void keyTyped(KeyEvent e) {
 
 	}
 
-	@Override
 	public void keyPressed(KeyEvent e) {
 		if(e.getKeyCode() == KeyEvent.VK_DOWN && currentSelection < 2) {
 			currentSelection++;
@@ -89,19 +81,13 @@ public class mainMenu implements KeyListener {	//KeyListener is like ActionListe
 			else if(currentSelection==2) ;
 			else System.out.println("Houston we have a problem with the selection");
 		}
-		
-		
 	}
 	
-	@Override
-	public void keyReleased(KeyEvent e) {
-	}
+	public void keyReleased(KeyEvent e) {}
 
 	public static void main(String[] args) {	//Call the graphics constructor
 		new mainMenu();
 	}
-
-
 
 	public class canvas extends JPanel {	//Make a new JPanel that you can draw objects onto (Can't draw stuff anywhere you want onto normal JPanels)
 		public void paintComponent(Graphics g) {

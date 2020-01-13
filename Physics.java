@@ -16,12 +16,14 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 	public static ArrayList<Platform> platformList = new ArrayList<Platform>();	//All platform objects
 	public static ArrayList<MeleeWeapon> weaponList = new ArrayList<MeleeWeapon>();	//All weapon objects
 	public static ArrayList<ProjectileWeapon> projectileList = new ArrayList<ProjectileWeapon>(); //All projectiles
-	
+
 	public static HashMap<String, BufferedImage> imageMap = new HashMap<String, BufferedImage>();
+
+	public static Map currentMap;
 
 	public static boolean paused = false;
 	public static boolean quit = false;
-	
+
 	public static boolean P1IsShooting = false;
 	public static boolean P2IsShooting = false;
 
@@ -35,7 +37,9 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(width, height);
 		frame.setResizable(false);
-		frame.addKeyListener(this);		
+		frame.addKeyListener(this);
+
+		backgroundImage = currentMap.getBack();
 
 		panel.setLayout(null);
 
@@ -49,10 +53,14 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 		platformList.add(new Platform(158, 245 ,107, 15, false, true));
 		platformList.add(new Platform(637, 245 ,105, 15, false, true));
 		platformList.add(new Platform(90, 315 ,710, 25, false, true));
-		
+
 		platformList.add(new Platform(30, 330, 60, 25, true, true));
 		platformList.add(new Platform(800, 330, 60, 25, true, false));
-		
+
+		Platform[] tempPlat = currentMap.getPlatformArray();
+		for(Platform p: tempPlat)
+			platformList.add(p);
+
 		try {
 			imageMap.put("fireball", ImageIO.read(new File("fireball.png")));
 			imageMap.put("sword", ImageIO.read(new File("sword.png")));
@@ -66,7 +74,7 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 
 		frame.setLocationRelativeTo(null);	//Make the frame visible
 		frame.setVisible(true);
-		
+
 		Thread closeThread = new Thread(new Runnable() {
 			public void run() {
 				while(!quit) {
@@ -82,7 +90,7 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 					while (!paused) {
 						if(P1IsShooting) physicsObjectList.get(0).swingWeapon();
 						if(P2IsShooting) physicsObjectList.get(1).swingWeapon();
-						
+
 						frame.repaint();	//Refresh frame and panel
 						panel.repaint();
 						try {Thread.sleep(17);} catch (Exception ex) {}	//10 millisecond delay between each refresh
@@ -98,7 +106,7 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 		quit = true;
 		paused = true;
 	}
-	
+
 	public static Image flip(BufferedImage original) {	//Flip image in parameter, then return it
 		BufferedImage img = new BufferedImage(original.getWidth(), original.getHeight(), BufferedImage.TYPE_INT_ARGB);
 		for(int i = original.getWidth()-1; i>0; i--)
@@ -123,7 +131,7 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 		panel.revalidate();
 		panel.repaint();
 	}
-	
+
 	public void keyTyped(KeyEvent e) {}		//KeyListener is an interface so must implement all empty methods, this one is just useless
 
 	public void keyPressed(KeyEvent e) {	//When the keys are pressed (when they're released is the method after this one)
@@ -136,7 +144,7 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 		}
 
 		if(e.getKeyCode() == KeyEvent.VK_COMMA)	P1IsShooting = true;
-			
+
 
 		//WASD for object2
 		if(e.getKeyCode() == KeyEvent.VK_D) physicsObjectList.get(1).moveX(4);	//"VK_*LETTER*" --> "D" key

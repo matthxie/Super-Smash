@@ -22,20 +22,15 @@ public class runThisFirst implements KeyListener {	//KeyListener is like ActionL
 		JLabel pic = new JLabel(new ImageIcon(image));
 		panel.add(pic);
 
-
 		frame.add(panel);
 
 		frame.setLocationRelativeTo(null);	//Make the frame visible
 		frame.setVisible(true);		
 	}
 
-
-
-
 	public void keyTyped(KeyEvent e) {}	//KeyListener is an interface so must implement all empty methods, this one is just useless
  
 	public void keyPressed(KeyEvent e) {	//When the keys are pressed (when they're released is the method after this one)
-
 		new mainMenu();
 		frame.dispose();
 	}
