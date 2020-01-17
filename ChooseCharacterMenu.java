@@ -28,9 +28,8 @@ public class ChooseCharacterMenu implements KeyListener {	//KeyListener is like 
 			Toolkit.getDefaultToolkit().createImage("p1ScreenFox.png"),
 			Toolkit.getDefaultToolkit().createImage("p1ScreenPikachu.png"),
 			Toolkit.getDefaultToolkit().createImage("p1Screen.png"),
-
-			
 	};
+	
 	private Image[] p2images = new Image[] {
 			Toolkit.getDefaultToolkit().createImage("p2ScreenMario.png"),
 			Toolkit.getDefaultToolkit().createImage("p2ScreenDonkey.png"),
@@ -41,9 +40,8 @@ public class ChooseCharacterMenu implements KeyListener {	//KeyListener is like 
 			Toolkit.getDefaultToolkit().createImage("p2ScreenFox.png"),
 			Toolkit.getDefaultToolkit().createImage("p2ScreenPikachu.png"),
 			Toolkit.getDefaultToolkit().createImage("p2Screen.png"),
-
-			
 	};
+	
 	private JFrame frame;	
 	private JPanel panel = new canvas();	
 
@@ -102,16 +100,13 @@ public class ChooseCharacterMenu implements KeyListener {	//KeyListener is like 
 
 	}
 
+	public void keyTyped(KeyEvent e) {}
 
-	@Override
-	public void keyTyped(KeyEvent e) {
-
-	}
-
-	@Override
 	public void keyPressed(KeyEvent e) {
 		if(playerNumber<3) {
-			if(e.getKeyCode() == KeyEvent.VK_RIGHT)
+			if(e.getKeyCode() == KeyEvent.VK_RIGHT) {
+				Physics.playSound("menuRight");
+				
 				if(currentSelection < 8) {
 					if(imageBoundsX[currentSelection+1][2]==0) {
 						currentSelection++;
@@ -124,8 +119,10 @@ public class ChooseCharacterMenu implements KeyListener {	//KeyListener is like 
 					currentSelection = 0;
 				}
 				else currentSelection = 1;
-
-			else if(e.getKeyCode() == KeyEvent.VK_LEFT)
+			}
+			else if(e.getKeyCode() == KeyEvent.VK_LEFT) {
+				Physics.playSound("menuLeft");
+				
 				if((currentSelection-1 >= 0 && imageBoundsX[currentSelection-1][2]==0)) {
 						currentSelection--;
 				}
@@ -133,9 +130,10 @@ public class ChooseCharacterMenu implements KeyListener {	//KeyListener is like 
 						currentSelection-=2;
 					}
 				else currentSelection = 8;
-
+			}
 			else if(e.getKeyCode()== KeyEvent.VK_ENTER) {
-
+				Physics.playSound("menuSelect");
+				
 				if(currentSelection == 8) randomPlayer();
 				else if(playerNumber == 1) {
 					imageBoundsX[currentSelection][2] = 1;

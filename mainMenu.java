@@ -10,8 +10,9 @@ public class mainMenu implements KeyListener {	//KeyListener is like ActionListe
 	private final int width = 900;
 	private int[][] wordBoundsX= new int[][] {
 		{610-5,200+10}, {500-5,395+9}, {560-5,300+10}
-	};//Order: SMASH, How to play, settings
-	private int[][] wordBoundsY = new int[][] {
+	};
+	
+	private int[][] wordBoundsY = new int[][] { //Order: SMASH, How to play, settings
 		{240-5, 40+10},{340-5,40+10},{440-5,40+10}
 	};
 	private boolean closed = false;
@@ -41,7 +42,6 @@ public class mainMenu implements KeyListener {	//KeyListener is like ActionListe
 		frame.setVisible(true);	
 		Thread updateMenu = new Thread(new Runnable() {	//The main loop
 			public void run() {	
-
 				while (!closed) {	
 					frame.repaint();	//Refresh frame and panel
 					panel.repaint();
@@ -58,23 +58,26 @@ public class mainMenu implements KeyListener {	//KeyListener is like ActionListe
 		rectY = wordBoundsY[currentSelection][0];
 		rectWidth = wordBoundsX[currentSelection][1];
 		rectHeight = wordBoundsY[currentSelection][1];
-
 	}
 
-	public void keyTyped(KeyEvent e) {
-
-	}
+	public void keyTyped(KeyEvent e) {}
 
 	public void keyPressed(KeyEvent e) {
 		if(e.getKeyCode() == KeyEvent.VK_DOWN && currentSelection < 2) {
+			Physics.playSound("menuLeft");
+			
 			currentSelection++;
 			setDrawnSelection();
 		}
 		else if(e.getKeyCode() == KeyEvent.VK_UP&&currentSelection > 0) {
+			Physics.playSound("menuRight");
+			
 			currentSelection--;
 			setDrawnSelection();
 		}
 		else if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+			Physics.playSound("menuSelect");
+			
 			closed = true;
 			if(currentSelection==0)new ChooseCharacterMenu();
 			else if(currentSelection==1) new HowToPlayMenu();

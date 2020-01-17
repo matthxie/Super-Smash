@@ -1,4 +1,8 @@
 import javax.imageio.ImageIO;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.FloatControl;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -10,22 +14,29 @@ import java.util.concurrent.ThreadLocalRandom;
 public class Physics implements KeyListener {	//KeyListener is like ActionListener but for keyboard
 	public static final int height = 600;	//Window dimensions
 	public static final int width = 900;
-
+	
 	//Put any and all objects you create into an ArrayList, the Canvas method will draw their contents onto the panel
-	public static ArrayList<PhysicsObject> physicsObjectList = new ArrayList<PhysicsObject>();	//All physics objects	
+	public static ArrayList<PhysicsObject> physicsObjectList = new ArrayList<PhysicsObject>();	//All physics objects
 	public static ArrayList<Platform> platformList = new ArrayList<Platform>();	//All platform objects
+	
 	public static ArrayList<MeleeWeapon> weaponList = new ArrayList<MeleeWeapon>();	//All weapon objects
 	public static ArrayList<ProjectileWeapon> projectileList = new ArrayList<ProjectileWeapon>(); //All projectiles
-
+	
+	public static HashMap<String, PhysicsObject> physicsObjectMap = new HashMap<String, PhysicsObject>();	//Stores available characters
 	public static HashMap<String, BufferedImage> imageMap = new HashMap<String, BufferedImage>();
-
-	public static Map currentMap;
-
+	
+	public static HashMap<String, Clip> soundMap = new HashMap<String, Clip>();	//Sound clips
+	
+	public static Map currentMap;	//Map from map selection menu
+	
+	public static String characterOne = "fox";	//Characters from character selection menu
+	public static String characterTwo = "samus";
+	
 	public static boolean paused = false;
 	public static boolean quit = false;
 
-	public static boolean P1IsShooting = false;
-	public static boolean P2IsShooting = false;
+	public static boolean P1IsShooting, P1HeavyAttack, P1Block = false;	//Whether player one is shooting
+	public static boolean P2IsShooting, P2HeavyAttack, P2Block = false;	//Whether player two is shooting
 
 	public static Image backgroundImage = Toolkit.getDefaultToolkit().createImage("better.jpg").getScaledInstance(width, height,java.awt.Image.SCALE_SMOOTH);
 
@@ -40,23 +51,39 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 		frame.addKeyListener(this);
 
 		backgroundImage = currentMap.getBack();
-
+		
 		panel.setLayout(null);
 
-		physicsObjectList.add(new PhysicsObject(1, "yoshi.png", "sword.png", true, ThreadLocalRandom.current().nextInt(100, 300 + 1), 100, 30, 40, 33.3, 10));
-		physicsObjectList.add(new PhysicsObject(2, "yoshi.png", "sword.png", false, ThreadLocalRandom.current().nextInt(550, 750 + 1), 100, 30, 40, 33.3, 20));
-
+		physicsObjectMap.put("mario", new PhysicsObject("mario.png", "sword.png", "fireball", false, ThreadLocalRandom.current().nextInt(100, 300 + 1), 100, 40, 50, 33.3, 10));
+		physicsObjectMap.put("donkey", new PhysicsObject("donkey.png", "sword.png", "fireball", true, ThreadLocalRandom.current().nextInt(100, 300 + 1), 100, 50, 60, 33.3, 10));
+		physicsObjectMap.put("link", new PhysicsObject("link.png", "sword.png", "arrow", false, ThreadLocalRandom.current().nextInt(100, 300 + 1), 100, 40, 50, 33.3, 10));
+		physicsObjectMap.put("samus", new PhysicsObject("samus.png", "sword.png", "laser", false, ThreadLocalRandom.current().nextInt(100, 300 + 1), 100, 50, 55, 33.3, 10));
+		physicsObjectMap.put("yoshi", new PhysicsObject("yoshi.png", "sword.png", "fireball", false, ThreadLocalRandom.current().nextInt(100, 300 + 1), 100, 40, 50, 33.3, 10));
+		physicsObjectMap.put("kirby", new PhysicsObject("kirby.png", "sword.png", "fireball", true, ThreadLocalRandom.current().nextInt(100, 300 + 1), 100, 40, 50, 33.3, 10));
+		physicsObjectMap.put("fox", new PhysicsObject("fox.png", "sword.png", "laser", false, ThreadLocalRandom.current().nextInt(100, 300 + 1), 100, 42, 53, 33.3, 10));
+		physicsObjectMap.put("pikachu", new PhysicsObject("pikachu.png", "sword.png", "fireball", false, ThreadLocalRandom.current().nextInt(100, 300 + 1), 100, 35, 45, 33.3, 10));
+		
+		physicsObjectList.add(physicsObjectMap.get(characterOne));
+		physicsObjectList.add(physicsObjectMap.get(characterTwo));
+		
+		physicsObjectList.get(0).setPlayerNumber(1);
+		physicsObjectList.get(1).setPlayerNumber(2);
+		
+		weaponList.add(physicsObjectList.get(0).getWeapon());
+		weaponList.add(physicsObjectList.get(1).getWeapon());
+		
 		platformList.add(new Platform(400, 92 ,101, 15, false, true));
 		platformList.add(new Platform(280, 170 ,102, 15, false, true));
 		platformList.add(new Platform(519, 170 ,102, 15, false, true));
 		platformList.add(new Platform(400, 245 ,101, 15, false, true));
 		platformList.add(new Platform(158, 245 ,107, 15, false, true));
 		platformList.add(new Platform(637, 245 ,105, 15, false, true));
+		
 		platformList.add(new Platform(90, 315 ,710, 25, false, true));
-
+		
 		platformList.add(new Platform(30, 330, 60, 25, true, true));
 		platformList.add(new Platform(800, 330, 60, 25, true, false));
-
+		
 		Platform[] tempPlat = currentMap.getPlatformArray();
 		for(Platform p: tempPlat)
 			platformList.add(p);
@@ -64,12 +91,21 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 		try {
 			imageMap.put("fireball", ImageIO.read(new File("fireball.png")));
 			imageMap.put("sword", ImageIO.read(new File("sword.png")));
+			imageMap.put("laser", ImageIO.read(new File("laser.png")));
 			imageMap.put("hand", ImageIO.read(new File("hand.png")));
 			imageMap.put("handFlipped", toBufferedImage(flip(ImageIO.read(new File("hand.png")))));
 			imageMap.put("steam", ImageIO.read(new File("steam.png")));
+			
 			imageMap.put("yoshi", toBufferedImage(ImageIO.read(new File("yoshi.png")).getScaledInstance(40, 50, Image.SCALE_SMOOTH)));
+			imageMap.put("mario", toBufferedImage(ImageIO.read(new File("mario.png")).getScaledInstance(40, 50, Image.SCALE_SMOOTH)));
+			imageMap.put("link", toBufferedImage(ImageIO.read(new File("link.png")).getScaledInstance(40, 50, Image.SCALE_SMOOTH)));
+			imageMap.put("donkey", toBufferedImage(ImageIO.read(new File("donkey.png")).getScaledInstance(40, 50, Image.SCALE_SMOOTH)));
+			imageMap.put("kirby", toBufferedImage(ImageIO.read(new File("kirby.png")).getScaledInstance(40, 50, Image.SCALE_SMOOTH)));
+			imageMap.put("samus", toBufferedImage(ImageIO.read(new File("samus.png")).getScaledInstance(40, 50, Image.SCALE_SMOOTH)));
+			imageMap.put("fox", toBufferedImage(ImageIO.read(new File("fox.png")).getScaledInstance(40, 50, Image.SCALE_SMOOTH)));
+			imageMap.put("pikachu", toBufferedImage(ImageIO.read(new File("pikachu.png")).getScaledInstance(40, 50, Image.SCALE_SMOOTH)));
 		} catch(IOException e) {}
-
+		
 		frame.add(panel);
 
 		frame.setLocationRelativeTo(null);	//Make the frame visible
@@ -88,8 +124,8 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 			public void run() {
 				while(!quit) {
 					while (!paused) {
-						if(P1IsShooting) physicsObjectList.get(0).swingWeapon();
-						if(P2IsShooting) physicsObjectList.get(1).swingWeapon();
+						if(P1Block || P1IsShooting || P1HeavyAttack) physicsObjectList.get(0).swingWeapon(P1Block, P1IsShooting, P1HeavyAttack);
+						if(P2Block || P2IsShooting || P2HeavyAttack) physicsObjectList.get(1).swingWeapon(P2Block, P2IsShooting, P2HeavyAttack);
 
 						frame.repaint();	//Refresh frame and panel
 						panel.repaint();
@@ -142,9 +178,13 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 		if(e.getKeyCode() == KeyEvent.VK_UP) {
 			if(physicsObjectList.get(0).getNumJumps()<=1) physicsObjectList.get(0).moveY(-10);	//Negative Y moves up
 		}
+		
+		if(e.getKeyCode() == KeyEvent.VK_DOWN)	//Move character down past ramp
+			physicsObjectList.get(0).moveY(10);
 
-		if(e.getKeyCode() == KeyEvent.VK_COMMA)	P1IsShooting = true;
-
+		if(e.getKeyCode() == KeyEvent.VK_PERIOD && !P1HeavyAttack && !P1Block)	P1IsShooting = true;	//Attack keys for player 1
+		if(e.getKeyCode() == KeyEvent.VK_SLASH && !P1IsShooting && !P1Block) P1HeavyAttack = true;
+		if(e.getKeyCode() == KeyEvent.VK_COMMA && !P1HeavyAttack && !P1HeavyAttack) P1Block = true;
 
 		//WASD for object2
 		if(e.getKeyCode() == KeyEvent.VK_D) physicsObjectList.get(1).moveX(4);	//"VK_*LETTER*" --> "D" key
@@ -153,17 +193,42 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 		if(e.getKeyCode() == KeyEvent.VK_W) {
 			if(physicsObjectList.get(1).getNumJumps()<=1) physicsObjectList.get(1).moveY(-10);
 		}
+		
+		if(e.getKeyCode() == KeyEvent.VK_S)
+			physicsObjectList.get(1).moveY(10);
 
-		if(e.getKeyCode() == KeyEvent.VK_X) P2IsShooting = true;
+		if(e.getKeyCode() == KeyEvent.VK_X && !P2HeavyAttack && !P2Block)	P2IsShooting = true;	//Attack keys for player 2
+		if(e.getKeyCode() == KeyEvent.VK_C && !P2IsShooting && !P2Block) P2HeavyAttack = true;
+		if(e.getKeyCode() == KeyEvent.VK_Z && !P2HeavyAttack && !P2HeavyAttack) P2Block = true;
 	}
 
 	public void keyReleased(KeyEvent e) {	//When the keys are released
+		if(e.getKeyCode() == KeyEvent.VK_W || e.getKeyCode() == KeyEvent.VK_S) physicsObjectList.get(1).moveY(0);
+		if(e.getKeyCode() == KeyEvent.VK_UP || e.getKeyCode() == KeyEvent.VK_DOWN) physicsObjectList.get(0).moveY(0);
+		
 		if(e.getKeyCode() == KeyEvent.VK_LEFT || e.getKeyCode() == KeyEvent.VK_RIGHT) physicsObjectList.get(0).moveX(0); //Object1
 		if(e.getKeyCode() == KeyEvent.VK_A || e.getKeyCode() == KeyEvent.VK_D) physicsObjectList.get(1).moveX(0); //Object2
-		if(e.getKeyCode() == KeyEvent.VK_COMMA)	P1IsShooting = false;
+		
+		if(e.getKeyCode() == KeyEvent.VK_COMMA)	P1Block = false;
+		if(e.getKeyCode() == KeyEvent.VK_PERIOD) P1IsShooting = false;
+		if(e.getKeyCode() == KeyEvent.VK_SLASH) P1HeavyAttack = false;
+		
+		if(e.getKeyCode() == KeyEvent.VK_Z) P2Block = false;
 		if(e.getKeyCode() == KeyEvent.VK_X) P2IsShooting = false;
+		if(e.getKeyCode() == KeyEvent.VK_C) P2HeavyAttack = false;
 	}
 
+	public static void playSound(String name) {	//Play a sound
+		try {
+			AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File(name + ".wav"));
+			soundMap.put(name, AudioSystem.getClip());
+			soundMap.get(name).open(audioInputStream);
+			
+			if(name.equalsIgnoreCase("main theme")) soundMap.get(name).loop(Clip.LOOP_CONTINUOUSLY);
+			else soundMap.get(name).start();
+		} catch(Exception ex) {}
+	}
+	
 	public static class Canvas extends JPanel {	//Make a new JPanel which unlike regular JPanels you can draw objects onto 
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);	//Call paintComponent from the overlord JPanel
@@ -188,7 +253,7 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 			}
 
 			for(int j=0; j<weaponList.size(); j++)	//Draw objects in weaponList
-				weaponList.get(j).draw(g);
+				if(weaponList.get(j).getVisible()) weaponList.get(j).draw(g);
 		}
 	}
 

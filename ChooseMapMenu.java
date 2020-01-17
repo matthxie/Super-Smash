@@ -68,22 +68,21 @@ public class ChooseMapMenu implements KeyListener {	//KeyListener is like Action
 					try {Thread.sleep(17);} catch (Exception ex) {}	//10 millisecond delay between each refresh
 				}
 				new Physics();
-				frame.dispose();
 
+				Physics.soundMap.get("main theme").stop();
+				Physics.soundMap.clear();
+				
+				Physics.playSound("gong");
+				frame.dispose();
 			}
 		});	
 		drawSquares.start();	//Start the main loop
 
 	}
 
-	@Override
-	public void keyTyped(KeyEvent e) {
+	public void keyTyped(KeyEvent e) {}
 
-	}
-
-	@Override
 	public void keyPressed(KeyEvent e) {
-		System.out.println(e.getKeyCode()+" "+KeyEvent.VK_ENTER);
 		if(e.getKeyCode() == KeyEvent.VK_RIGHT) {
 			if(!onSettings) {
 				if(currentSelection < 5) {
@@ -101,6 +100,8 @@ public class ChooseMapMenu implements KeyListener {	//KeyListener is like Action
 				if(prevSelection-1>=0) {
 					prevPrevSelection = prevSelection-1;
 				} else prevPrevSelection =5;
+				
+				Physics.playSound("menuRight");
 			}
 		}
 		else if(e.getKeyCode() == KeyEvent.VK_UP) {
@@ -125,6 +126,8 @@ public class ChooseMapMenu implements KeyListener {	//KeyListener is like Action
 				if(prevSelection-1>=0) {
 					prevPrevSelection = prevSelection-1;
 				} else prevPrevSelection =5;
+				
+				Physics.playSound("menuLeft");
 			}
 			
 		}

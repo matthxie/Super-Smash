@@ -21,11 +21,13 @@ public class runThisFirst implements KeyListener {	//KeyListener is like ActionL
 		Image image = icon.getImage().getScaledInstance(width, height, java.awt.Image.SCALE_SMOOTH);
 		JLabel pic = new JLabel(new ImageIcon(image));
 		panel.add(pic);
-
+		
 		frame.add(panel);
 
 		frame.setLocationRelativeTo(null);	//Make the frame visible
-		frame.setVisible(true);		
+		frame.setVisible(true);
+		
+		Physics.playSound("main theme");
 	}
 
 	public void keyTyped(KeyEvent e) {}	//KeyListener is an interface so must implement all empty methods, this one is just useless

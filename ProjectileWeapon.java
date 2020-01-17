@@ -16,8 +16,8 @@ public class ProjectileWeapon {
 	
 	private int orientation;
 	
-	public ProjectileWeapon(Image img, PhysicsObject initializer, int x, int y, int width, int height, double speed, double damage, double mass, int orientation) {
-		this.img = img;
+	public ProjectileWeapon(String name, PhysicsObject initializer, int x, int y, int width, int height, double damage, double mass, int orientation) {
+		this.img = Physics.imageMap.get(name);
 		this.initializer = initializer;
 		
 		this.lastX = x;
@@ -26,7 +26,10 @@ public class ProjectileWeapon {
 		this.projectileW = width;
 		this.projectileH = height;
 		
-		this.speed = speed;
+		if(name.equals("fireball")) this.speed = 5;
+		else if(name.equals("laser")) this.speed = 8;
+		else if(name.equals("arrow")) this.speed = 6;
+		
 		this.damage = damage; 
 		this.mass = mass;		
 		

@@ -20,8 +20,10 @@ public class MeleeWeapon {
 	private double speed;
 	private double damage;
 	private double mass;
+	
+	private boolean visible;
 
-	public MeleeWeapon(String imgName, int x, int y, int width, int height, double speed, double damage, double mass) {
+	public MeleeWeapon(String imgName, boolean visible, int x, int y, int width, int height, double speed, double damage, double mass) {
 		try { img = ImageIO.read(new File(imgName)); 
 		img = img.getScaledInstance(width, height, Image.SCALE_SMOOTH); 
 		} catch (IOException e) {}
@@ -38,6 +40,8 @@ public class MeleeWeapon {
 		this.speed = speed;
 		this.damage = damage; 
 		this.mass = mass;
+		
+		this.visible = visible;
 	}
 
 	public void draw(Graphics g) {
@@ -99,6 +103,14 @@ public class MeleeWeapon {
 	public boolean getFlipped() {
 		if(flipped == 235) return true;
 		else return false;
+	}
+	
+	public void setVisible(boolean visible) {
+		this.visible = visible;
+	}
+	
+	public boolean getVisible() {
+		return visible;
 	}
 	
 	public double getDamage() {
