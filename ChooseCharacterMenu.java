@@ -7,10 +7,11 @@ import java.io.IOException;
 public class ChooseCharacterMenu implements KeyListener {	//KeyListener is like ActionListener but for keyboard
 	private int rectX,rectY,rectWidth,rectHeight;
 	private int playerNumber = 1;
-	private Font font = null,fontSmaller=null;
+	private Font font = null,fontSmaller=null, fontMedium=null;
 	private int currentSelection = 0;
 	private final int height = 600;	//Window dimensions
 	private final int width = 900;
+	private String[] characterList = {"Mario", "Donkey Kong",  "Link", "Samus", "Yoshi", "Kirby", "Fox", "Pikachu", "Random"};
 	private Image chooseCharImage  = Toolkit.getDefaultToolkit().createImage("betterSmashChoose.png").getScaledInstance(width, height,java.awt.Image.SCALE_SMOOTH);
 	private int[][] imageBoundsX= new int[][] {
 		{97,140,0}, {238,141,0}, {379,141,0}, {521,141,0},{662,141,0}, {167,141,0}, {309,141,0}, {450,141,0}, {591, 143,0}
@@ -28,8 +29,9 @@ public class ChooseCharacterMenu implements KeyListener {	//KeyListener is like 
 			Toolkit.getDefaultToolkit().createImage("p1ScreenFox.png"),
 			Toolkit.getDefaultToolkit().createImage("p1ScreenPikachu.png"),
 			Toolkit.getDefaultToolkit().createImage("p1Screen.png"),
+
+			
 	};
-	
 	private Image[] p2images = new Image[] {
 			Toolkit.getDefaultToolkit().createImage("p2ScreenMario.png"),
 			Toolkit.getDefaultToolkit().createImage("p2ScreenDonkey.png"),
@@ -40,8 +42,9 @@ public class ChooseCharacterMenu implements KeyListener {	//KeyListener is like 
 			Toolkit.getDefaultToolkit().createImage("p2ScreenFox.png"),
 			Toolkit.getDefaultToolkit().createImage("p2ScreenPikachu.png"),
 			Toolkit.getDefaultToolkit().createImage("p2Screen.png"),
+
+			
 	};
-	
 	private JFrame frame;	
 	private JPanel panel = new canvas();	
 
@@ -52,17 +55,13 @@ public class ChooseCharacterMenu implements KeyListener {	//KeyListener is like 
 		try {
 			Font tempfont = Font.createFont(Font.TRUETYPE_FONT, fontFile);
 			font = tempfont.deriveFont((float)(40));
-
-		} catch (FontFormatException e) {
-		} catch (IOException e) {
-		}
-		try {
-			Font tempfont = Font.createFont(Font.TRUETYPE_FONT, fontFile);
 			fontSmaller = tempfont.deriveFont((float)(20));
+			fontMedium = tempfont.deriveFont((float)(25));
 
 		} catch (FontFormatException e) {
 		} catch (IOException e) {
 		}
+		
 		frame = new JFrame("Choose Your Character");	//Frame stuff
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(width, height);
@@ -100,13 +99,16 @@ public class ChooseCharacterMenu implements KeyListener {	//KeyListener is like 
 
 	}
 
-	public void keyTyped(KeyEvent e) {}
 
+	@Override
+	public void keyTyped(KeyEvent e) {
+
+	}
+
+	@Override
 	public void keyPressed(KeyEvent e) {
 		if(playerNumber<3) {
-			if(e.getKeyCode() == KeyEvent.VK_RIGHT) {
-				Physics.playSound("menuRight");
-				
+			if(e.getKeyCode() == KeyEvent.VK_RIGHT)
 				if(currentSelection < 8) {
 					if(imageBoundsX[currentSelection+1][2]==0) {
 						currentSelection++;
@@ -119,10 +121,8 @@ public class ChooseCharacterMenu implements KeyListener {	//KeyListener is like 
 					currentSelection = 0;
 				}
 				else currentSelection = 1;
-			}
-			else if(e.getKeyCode() == KeyEvent.VK_LEFT) {
-				Physics.playSound("menuLeft");
-				
+
+			else if(e.getKeyCode() == KeyEvent.VK_LEFT)
 				if((currentSelection-1 >= 0 && imageBoundsX[currentSelection-1][2]==0)) {
 						currentSelection--;
 				}
@@ -130,10 +130,9 @@ public class ChooseCharacterMenu implements KeyListener {	//KeyListener is like 
 						currentSelection-=2;
 					}
 				else currentSelection = 8;
-			}
+
 			else if(e.getKeyCode()== KeyEvent.VK_ENTER) {
-				Physics.playSound("menuSelect");
-				
+
 				if(currentSelection == 8) randomPlayer();
 				else if(playerNumber == 1) {
 					imageBoundsX[currentSelection][2] = 1;
@@ -201,11 +200,20 @@ public class ChooseCharacterMenu implements KeyListener {	//KeyListener is like 
 		   // g.drawImage(p2images[8], 468, 319,468,257, null);
 		    if(playerNumber == 1) {
 		    	g.drawImage(p1images[currentSelection], 0, 320,468,257, null);
+		    	g.setFont(fontMedium);
+				FontMetrics mediumMetrics = g.getFontMetrics(fontMedium);
+				int x=210 + (280 - mediumMetrics.stringWidth(characterList[currentSelection])) / 2;
+			    int y = 200 + ((400 - mediumMetrics.getHeight()) / 2) + mediumMetrics.getAscent();
+		    	g.drawString(characterList[currentSelection], x,y);
 			    g.drawImage(p2images[8], 468, 319,468,257, null);
 		    }
 		    else {
+				FontMetrics mediumMetrics = g.getFontMetrics(fontMedium);
+				g.setFont(fontMedium);
 			    g.drawImage(p2images[currentSelection], 468, 319,468,257, null);
-
+			    int x=490 + (600 - mediumMetrics.stringWidth(characterList[currentSelection])) / 2;
+			    int y = 200 + ((400 - mediumMetrics.getHeight()) / 2) + mediumMetrics.getAscent();
+		    	g.drawString(characterList[currentSelection], x,y);
 		    }
 		    //g.drawImage(pickP1Image, 0-9,0-82,null);
 			for(int i = 0; i < imageBoundsX.length; i++) {
