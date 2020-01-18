@@ -2,6 +2,11 @@ import javax.swing.*;
 
 import java.awt.*;
 import java.awt.event.*;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.File;
+import java.io.IOException;
 
 public class mainMenu implements KeyListener {	//KeyListener is like ActionListener but for keyboard
 	private int rectX,rectY,rectWidth,rectHeight;
@@ -10,9 +15,8 @@ public class mainMenu implements KeyListener {	//KeyListener is like ActionListe
 	private final int width = 900;
 	private int[][] wordBoundsX= new int[][] {
 		{610-5,200+10}, {500-5,395+9}, {560-5,300+10}
-	};
-	
-	private int[][] wordBoundsY = new int[][] { //Order: SMASH, How to play, settings
+	};//Order: SMASH, How to play, settings
+	private int[][] wordBoundsY = new int[][] {
 		{240-5, 40+10},{340-5,40+10},{440-5,40+10}
 	};
 	private boolean closed = false;
@@ -42,12 +46,14 @@ public class mainMenu implements KeyListener {	//KeyListener is like ActionListe
 		frame.setVisible(true);	
 		Thread updateMenu = new Thread(new Runnable() {	//The main loop
 			public void run() {	
+
 				while (!closed) {	
 					frame.repaint();	//Refresh frame and panel
 					panel.repaint();
 					try {Thread.sleep(17);} catch (Exception ex) {}	//10 millisecond delay between each refresh
 				}
 				frame.dispose();
+				
 			}
 		});	
 		updateMenu.start();	//Start the main loop
@@ -58,39 +64,51 @@ public class mainMenu implements KeyListener {	//KeyListener is like ActionListe
 		rectY = wordBoundsY[currentSelection][0];
 		rectWidth = wordBoundsX[currentSelection][1];
 		rectHeight = wordBoundsY[currentSelection][1];
+
 	}
 
-	public void keyTyped(KeyEvent e) {}
 
+	@Override
+	public void keyTyped(KeyEvent e) {
+
+	}
+
+	@Override
 	public void keyPressed(KeyEvent e) {
 		if(e.getKeyCode() == KeyEvent.VK_DOWN && currentSelection < 2) {
 			Physics.playSound("menuLeft");
-			
 			currentSelection++;
+			
 			setDrawnSelection();
 		}
 		else if(e.getKeyCode() == KeyEvent.VK_UP&&currentSelection > 0) {
 			Physics.playSound("menuRight");
-			
+
 			currentSelection--;
 			setDrawnSelection();
 		}
 		else if(e.getKeyCode() == KeyEvent.VK_ENTER) {
 			Physics.playSound("menuSelect");
-			
+
 			closed = true;
 			if(currentSelection==0)new ChooseCharacterMenu();
 			else if(currentSelection==1) new HowToPlayMenu();
-			else if(currentSelection==2) ;
+			else if(currentSelection==2) new Settings();
 			else System.out.println("Houston we have a problem with the selection");
 		}
+		
+		
 	}
 	
-	public void keyReleased(KeyEvent e) {}
+	@Override
+	public void keyReleased(KeyEvent e) {
+	}
 
 	public static void main(String[] args) {	//Call the graphics constructor
 		new mainMenu();
 	}
+
+
 
 	public class canvas extends JPanel {	//Make a new JPanel that you can draw objects onto (Can't draw stuff anywhere you want onto normal JPanels)
 		public void paintComponent(Graphics g) {
