@@ -12,7 +12,7 @@ public class ChooseCharacterMenu implements KeyListener {	//KeyListener is like 
 	private final int height = 600;	//Window dimensions
 	private final int width = 900;
 	private Image chooseCharImage  = Toolkit.getDefaultToolkit().createImage("betterSmashChoose.png").getScaledInstance(width, height,java.awt.Image.SCALE_SMOOTH);
-		private String[] characterList = {"Mario", "Donkey Kong",  "Link", "Samus", "Yoshi", "Kirby", "Fox", "Pikachu", "Random"};
+	private String[] characterList = {"Mario", "Donkey Kong",  "Link", "Samus", "Yoshi", "Kirby", "Fox", "Pikachu", "Random"};
 
 	private int[][] imageBoundsX= new int[][] {
 		{97,140,0}, {238,141,0}, {379,141,0}, {521,141,0},{662,141,0}, {167,141,0}, {309,141,0}, {450,141,0}, {591, 143,0}
@@ -192,10 +192,8 @@ public class ChooseCharacterMenu implements KeyListener {	//KeyListener is like 
 			}
 			else g.drawString("Player 2 ChOose Your Character", 80, 40);
 
-//			g.drawString("Player 1:", 80, 380);
-			g.drawImage(chooseCharImage, 0, 0-20, null);
+		    g.drawImage(chooseCharImage, 0, 0-20, null);
 		    g.drawImage(p1images[8], 0, 320,468,257, null);
-		   // g.drawImage(p2images[8], 468, 319,468,257, null);
 		    if(playerNumber == 1) {
 		    	g.drawImage(p1images[currentSelection], 0, 320,468,257, null);
 		    	g.setFont(fontMedium);
