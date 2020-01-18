@@ -109,11 +109,13 @@ public class MeleeWeapon {
 		this.visible = visible;
 	}
 	
-	public boolean getVisible() {
-		return visible;
+	public void doubleDamage(boolean damage) {
+		if(damage) this.damage = 0.2;
+		else this.damage = 0.1;
 	}
 	
 	public double getDamage() {
-		return damage;
+		if(visible) return damage;
+		else return 0;
 	}
 }

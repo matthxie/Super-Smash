@@ -32,6 +32,7 @@ public class PhysicsObject extends JPanel {
 
 	private String projectileName;	//The projectile this character uses
 	private String weaponName;	//The melee weapon this character uses
+	private String heavyWeaponName;	//The melee weapon used for heavy attacks
 
 	private long fireTime;	//Used to keep a time limit between how often the player can fire
 	private long hitTime;	//Used to store how long it has been since the player was last hit, player cannot control character within this time
@@ -60,8 +61,10 @@ public class PhysicsObject extends JPanel {
 	private Image img;	//The image used for this player object
 	
 	private int frameNum; 	//The frame number used to play death effect frame by frame
+	
+	private int blocking;
 
-	public PhysicsObject(String file, String weaponName, String projectileName, boolean melee, int x, int y, int width, int height, double mass, int runSpeed) {
+	public PhysicsObject(String file, String weaponName, String heavyWeaponName, String projectileName, boolean melee, int x, int y, int width, int height, double mass, int runSpeed) {
 		this.characterName = file.substring(0, file.length()-4);
 
 		this.objectW = width;
@@ -76,10 +79,11 @@ public class PhysicsObject extends JPanel {
 		this.runSpeed = runSpeed;
 
 		this.melee = melee;
-		this.weapon = new MeleeWeapon(weaponName, melee, lastX-(objectW/2), lastY+(objectH/2), 40, 40, 2, 0.2, 10);
-
+		this.weapon = new MeleeWeapon(weaponName, melee, lastX-(objectW/2), lastY+(objectH/2), 40, 40, 2, 0.1, 10);
+		
 		this.projectileName = projectileName;
 		this.weaponName = weaponName.substring(0, weaponName.length()-4);
+		this.heavyWeaponName = heavyWeaponName;
 
 		this.fireTime = System.currentTimeMillis();
 
@@ -102,6 +106,8 @@ public class PhysicsObject extends JPanel {
 		this.damageTaken = 0;
 
 		this.frameNum = 1;
+		
+		this.blocking = 1;
 
 		try { this.img = ImageIO.read(new File(file));
 		img = img.getScaledInstance(objectW, objectH, Image.SCALE_SMOOTH); 
@@ -118,13 +124,6 @@ public class PhysicsObject extends JPanel {
 				
 				deadRightNow=true;
 			}
-			
-			/*if(onLadder && this.lastY > 190) {
-			System.out.println("Ha");
-			this.lastY-= 2;
-			this.falling = false;
-			
-			}*/
 
 			if(falling && !platformCollision() && !objectCollision(lastX, lastY, false)) { //Make the object fall
 				if(fallSpeed < 0) fallSpeed += 0.5;	//Slow down upward speed until it becomes 0
@@ -148,7 +147,7 @@ public class PhysicsObject extends JPanel {
 
 			if(falling) lastY += fallSpeed * fallingTime;	//Fall only if falling boolean says true, fallingTime is a modifier
 
-			if(!objectCollision(lastX+moveSpeed, lastY, false)) {	//Move if movement will not result in a collision
+			if(!objectCollision(lastX+moveSpeed, lastY, false) && blocking == 1) {	//Move if movement will not result in a collision
 				if(!friction) lastX += moveSpeed;	//Move if there is no friction
 				else {
 					if(moveSpeed > 0 && !falling) moveSpeed -= 0.8;	//Ground friction: decrease moveSpeed until it's 0 (when going right)
@@ -233,7 +232,7 @@ public class PhysicsObject extends JPanel {
 
 			gg.drawString("Player " + playerNumber, lastX, lastY-10);
 		}
-		else if(numDeath > 4) {
+		else if(numDeath > 3) {
 			Physics.paused = true;
 
 			int goOrNot = JOptionPane.showConfirmDialog(Physics.frame,
@@ -263,14 +262,14 @@ public class PhysicsObject extends JPanel {
 			Physics.playSound("death");
 			if(frameNum <= 11) {
 				if(lastX < 0) gg.drawImage(Physics.flip(Physics.toBufferedImage(Physics.imageMap.get("frame"+frameNum))), 0, lastY, null);
-				else gg.drawImage(Physics.imageMap.get("frame"+frameNum), Physics.width-400, lastY, null);
+				else gg.drawImage(Physics.imageMap.get("frame"+frameNum), Physics.width-560, lastY, null);
 				frameNum++;
 			}
 		}
 	}
 
 	public void moveX(double dx) {	//Horizontal movement
-		if(dx != 0 && !hanging && hitTime+500<System.currentTimeMillis()) {
+		if(dx != 0 && !hanging && hitTime+400<System.currentTimeMillis()) {
 			friction = false;	//No friction while user is pressing the move key
 			moveSpeed = dx;
 
@@ -286,13 +285,13 @@ public class PhysicsObject extends JPanel {
 	}
 
 	public void moveY(double dy) {	//Vertical movement
-		if(dy < 0 && hitTime+500<System.currentTimeMillis()) {
+		if(dy < 0 && hitTime+400<System.currentTimeMillis()) {
 			numJumps++;
 			fallingTime = 1;
 			fallSpeed = dy;
 			Physics.playSound("jump.wav");
 		}
-		else if(dy > 0 && platform.getPlatHeight() < 25 && hitTime+500<System.currentTimeMillis()){
+		else if(dy > 0 && platform.getPlatHeight() < 25 && hitTime+500<System.currentTimeMillis()) {
 			lastY += platform.getPlatHeight();
 			falling = true;
 		}
@@ -390,7 +389,10 @@ public class PhysicsObject extends JPanel {
 
 	public void swingWeapon(boolean block, boolean attack, boolean heavy) {	//Attack with this object, whether with melee or with projectile
 		if(!hanging) {
-			if(!melee && attack && fireTime + 400 < System.currentTimeMillis()) {	//With projectile				
+			if(block) blocking = 2;
+			else blocking = 1;
+			
+			if(!melee && attack && fireTime+400<System.currentTimeMillis()) {	//With projectile				
 				Physics.playSound(projectileName);
 				Physics.projectileList.add(new ProjectileWeapon(projectileName, this, lastX-(objectW/2), lastY+(objectH/8), 50, 30, 0.2, 10, orientation));
 				fireTime = System.currentTimeMillis();
@@ -409,16 +411,26 @@ public class PhysicsObject extends JPanel {
 			if(melee && heavy && fireTime + 300<System.currentTimeMillis()) {
 				if(!swingWeapon) Physics.playSound(weaponName);
 				swingWeapon = true;
+				
+				if(orientation<0) weapon.setImg(Physics.imageMap.get("axe"));
+				else weapon.setImg(Physics.flip(Physics.toBufferedImage(Physics.imageMap.get("axe"))));
+				weapon.doubleDamage(true);
+				
 				fireTime = System.currentTimeMillis();
+			}
+			if(melee && !heavy) {
+				if(orientation<0) weapon.setImg(Physics.imageMap.get("sword"));
+				else weapon.setImg(Physics.flip(Physics.toBufferedImage(Physics.imageMap.get("sword"))));
+				weapon.doubleDamage(false);
 			}
 		}
 	}
 
 	public void dealDamage(double damage, PhysicsObject o) {	//Deal damage the object that has been hit
-		o.moveSpeed += ((o.damagePercentage/3)*damage) * this.orientation;	//Push object right
-		if(o.damagePercentage < 90) o.fallSpeed -= (1.5*(o.damagePercentage/3)*damage);	//Push object up 
-		else o.fallSpeed -= o.damagePercentage/3*damage;
-		o.damageTaken += damage;	//Add to other player's damage percentage
+		o.moveSpeed += ((o.damagePercentage/3)*damage) * this.orientation / blocking;	//Push object right
+		if(o.damagePercentage < 90) o.fallSpeed -= (1.5*(o.damagePercentage/3)*damage) / blocking;	//Push object up 
+		else o.fallSpeed -= o.damagePercentage/3*damage / blocking;
+		o.damageTaken += damage / blocking;	//Add to other player's damage percentage
 		o.hanging = false;
 
 		if(Math.abs(o.fallSpeed)>4 || Math.abs(o.moveSpeed)>3) o.hitTime = System.currentTimeMillis();
@@ -468,5 +480,9 @@ public class PhysicsObject extends JPanel {
 
 	public void setPlayerNumber(int num) {
 		playerNumber = num;
+	}
+	
+	public void stopBlocking() {
+		blocking = 1;
 	}
 }
