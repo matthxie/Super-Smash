@@ -6,18 +6,19 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Physics implements KeyListener {	//KeyListener is like ActionListener but for keyboard
 	public static final int height = 600;	//Window dimensions
 	public static final int width = 900;
-	
-	//Put any and all objects you create into an ArrayList, the Canvas method will draw their contents onto the panel
-	public static ArrayList<PhysicsObject> physicsObjectList = new ArrayList<PhysicsObject>();	//All physics objects
+	//public static final Image[] characterChoices;
+	//Put any and all objects you create into an ArrayList, the canvas method will draw their contents onto the panel
+	public static ArrayList<PhysicsObject> physicsObjectList = new ArrayList<PhysicsObject>();	//All physics objects	
 	public static ArrayList<Platform> platformList = new ArrayList<Platform>();	//All platform objects
-	
+
 	public static ArrayList<MeleeWeapon> weaponList = new ArrayList<MeleeWeapon>();	//All weapon objects
 	public static ArrayList<ProjectileWeapon> projectileList = new ArrayList<ProjectileWeapon>(); //All projectiles
 	
@@ -25,34 +26,31 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 	public static HashMap<String, BufferedImage> imageMap = new HashMap<String, BufferedImage>();
 	
 	public static HashMap<String, Clip> soundMap = new HashMap<String, Clip>();	//Sound clips
-	
-	public static Map currentMap;	//Map from map selection menu
-	
+
 	public static String characterOne = "link";	//Characters from character selection menu
 	public static String characterTwo = "donkey";
 	
 	public static boolean paused = false;
 	public static boolean quit = false;
-
+	public static Map currentMap;
+	
 	public static boolean P1IsShooting, P1HeavyAttack, P1Block = false;	//Whether player one is shooting
 	public static boolean P2IsShooting, P2HeavyAttack, P2Block = false;	//Whether player two is shooting
 
-	public static Image backgroundImage = Toolkit.getDefaultToolkit().createImage("better.jpg").getScaledInstance(width, height,java.awt.Image.SCALE_SMOOTH);
 	
+	Image backgroundImage;
 	public static JFrame frame;
-	public static JPanel panel = new Canvas();	//Canvas is a method which creates a panel that you can "draw" objects onto
+	JPanel panel = new canvas();	//canvas is a method which creates a panel that you can "draw" objects onto
 
 	public Physics() {
 		frame = new JFrame("Super Smash");	//Frame stuff
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(width, height);
 		frame.setResizable(false);
-		frame.addKeyListener(this);
-
+		frame.addKeyListener(this);		
 		backgroundImage = currentMap.getBack();
-		
-		panel.setLayout(null);
-		
+		panel.setLayout(null);	
+
 		physicsObjectMap.put("mario", new PhysicsObject("mario.png", "sword.png", "axe.png", "fireball", false, ThreadLocalRandom.current().nextInt(100, 300 + 1), 100, 40, 50, 33.3, 10));
 		physicsObjectMap.put("donkey", new PhysicsObject("donkey.png", "sword.png", "axe.png", "fireball", true, ThreadLocalRandom.current().nextInt(100, 300 + 1), 100, 40, 50, 33.3, 10));
 		physicsObjectMap.put("link", new PhysicsObject("link.png", "sword.png", "axe.png", "arrow", false, ThreadLocalRandom.current().nextInt(100, 300 + 1), 100, 40, 50, 33.3, 10));
@@ -72,22 +70,10 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 		weaponList.add(physicsObjectList.get(1).getWeapon());
 
 		
-		/*platformList.add(new Platform(400, 92 ,101, 15, false, true));
-		platformList.add(new Platform(280, 170 ,102, 15, false, true));
-		platformList.add(new Platform(519, 170 ,102, 15, false, true));
-		platformList.add(new Platform(400, 245 ,101, 15, false, true));
-		platformList.add(new Platform(158, 245 ,107, 15, false, true));
-		platformList.add(new Platform(637, 245 ,105, 15, false, true));
-		
-		platformList.add(new Platform(90, 315 ,710, 25, false, true));
-		
-		platformList.add(new Platform(30, 330, 60, 25, true, true));
-		platformList.add(new Platform(800, 330, 60, 25, true, false));*/
-				
 		Platform[] tempPlat = currentMap.getPlatformArray();
-		for(Platform p: tempPlat)
+		for(Platform p: tempPlat) {
 			platformList.add(p);
-
+		}
 		try {	//Load in all required sprites and images
 			imageMap.put("fireball", ImageIO.read(new File("fireball.png")));
 			imageMap.put("sword", ImageIO.read(new File("sword.png")));
@@ -119,22 +105,26 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 			imageMap.put("pikachu", toBufferedImage(ImageIO.read(new File("pikachu.png")).getScaledInstance(40, 50, Image.SCALE_SMOOTH)));
 		} catch(IOException e) {}
 		
+		
 		frame.add(panel);
-
+	
 		frame.setLocationRelativeTo(null);	//Make the frame visible
 		frame.setVisible(true);
-
 		Thread closeThread = new Thread(new Runnable() {
 			public void run() {
 				while(!quit) {
-					try { Thread.sleep(10);} catch (InterruptedException e) {}
+					try {
+						Thread.sleep(10);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
 				}
 				frame.dispose();
 				new mainMenu();
 			}
 		});
 		Thread animationThread = new Thread(new Runnable() {	//The main loop
-			public void run() {
+			public void run() {	
 				while(!quit) {
 					while (!paused) {
 						if(P1IsShooting || P1HeavyAttack) physicsObjectList.get(0).swingWeapon(P1Block, P1IsShooting, P1HeavyAttack);
@@ -144,16 +134,21 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 						panel.repaint();
 						try {Thread.sleep(17);} catch (Exception ex) {}	//10 millisecond delay between each refresh
 					}
+
 				}
+
+
 			}
-		});			
+		});	
 		closeThread.start();
 		animationThread.start();	//Start the main loop
+
+
 	}
 
 	public static void closeAll() {
-		quit = true;
-		paused = true;
+		quit=true;
+		paused=true;
 	}
 
 	public static Image flip(BufferedImage original) {	//Flip image in parameter, then return it
@@ -163,7 +158,6 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 				img.setRGB(original.getWidth()-i, j, original.getRGB(i, j));
 		return img;
 	}
-
 	public static BufferedImage toBufferedImage(Image img) {	//Convert Image into BufferedImage, returns Image
 		if(img instanceof BufferedImage) return (BufferedImage) img;
 
@@ -174,14 +168,13 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 
 		return temp;
 	}
-
 	public void clearAll() {	//Clear all components from panel
 		panel.removeAll();
 		panel.revalidate();
 		panel.repaint();
 	}
-
-	public void keyTyped(KeyEvent e) {}		//KeyListener is an interface so must implement all empty methods, this one is just useless
+	public void keyTyped(KeyEvent e) {
+	}		//KeyListener is an interface so must implement all empty methods, this one is just useless
 
 	public void keyPressed(KeyEvent e) {	//When the keys are pressed (when they're released is the method after this one)
 		//Arrow keys for object1
@@ -236,7 +229,6 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 		if(e.getKeyCode() == KeyEvent.VK_X) P2IsShooting = false;
 		if(e.getKeyCode() == KeyEvent.VK_C) P2HeavyAttack = false;
 	}
-
 	public static void playSound(String name) {	//Play a sound
 		try {
 			AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File(name + ".wav"));
@@ -248,16 +240,18 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 		} catch(Exception ex) {}
 	}
 	
-	public static class Canvas extends JPanel {	//Make a new JPanel which unlike regular JPanels you can draw objects onto 
+	
+	public class canvas extends JPanel {	//Make a new JPanel that you can draw objects onto (Can't draw stuff anywhere you want onto normal JPanels)
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);	//Call paintComponent from the overlord JPanel
 			g.drawImage(backgroundImage, 0, 0, null);
-			
-			//for(int i=0; i<platformList.size(); i++)
-			//	platformList.get(i).draw(g);
-			
+
 			for(int i=0; i<physicsObjectList.size(); i++) //Draw objects from physicsObjectList
 				physicsObjectList.get(i).draw(g);
+
+
+//			for(int i=0; i<platformList.size(); i++) //Draws all the obejcts from physicsObjectList
+//				platformList.get(i).draw(g);
 
 			for(int l=0; l<projectileList.size(); l++) {	//Draw projectiles
 				if(projectileList.get(l).attack()) projectileList.remove(l);	//Returns true if at edge of screen, removes object
@@ -273,8 +267,7 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 					}
 				}
 			}
-
-			for(int j=0; j<weaponList.size(); j++)	//Draw objects in weaponList
+			for(int j=0; j<weaponList.size(); j++)	//Draw contents in weaponList
 				weaponList.get(j).draw(g);
 		}
 	}
