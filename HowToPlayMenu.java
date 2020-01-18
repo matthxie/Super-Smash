@@ -67,7 +67,6 @@ public class HowToPlayMenu implements KeyListener {	//KeyListener is like Action
 
 	}
 
-	@Override
 	public void keyPressed(KeyEvent e) {
 		if(e.getKeyCode() == KeyEvent.VK_LEFT && currentSelection >0) {
 			currentSelection--;
@@ -78,15 +77,25 @@ public class HowToPlayMenu implements KeyListener {	//KeyListener is like Action
 			setDrawnSelection();
 		}
 		else if(e.getKeyCode() == KeyEvent.VK_ENTER) {
-			if(currentSelection==0) {
+			if(currentSelection==0 && pageNumber == 1) {
 				closed = true;
 				new mainMenu();
 			}
-			else if(currentSelection==1) {
-				backgroundImg = Toolkit.getDefaultToolkit().createImage("MOVEMENTCONTROKS.png").getScaledInstance(width, height,java.awt.Image.SCALE_SMOOTH);
-
+			else if(currentSelection ==0 && pageNumber == 2) {
+				backgroundImg = Toolkit.getDefaultToolkit().createImage("MOVEMENTCONTROLS.png").getScaledInstance(width, height,java.awt.Image.SCALE_SMOOTH);
+				pageNumber = 1;
 			}
-			System.out.println("Houston we have a problem with the selection");
+			else if(currentSelection==1 && pageNumber == 1) {
+
+				backgroundImg = Toolkit.getDefaultToolkit().createImage("AttackControls.png").getScaledInstance(width, height,java.awt.Image.SCALE_SMOOTH);
+				pageNumber = 2;
+				currentSelection =0;
+				setDrawnSelection();
+			}else if(pageNumber == 2 && currentSelection==1) {
+				closed = true;
+				new mainMenu();
+			}
+
 		}
 	}
 
