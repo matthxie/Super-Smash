@@ -7,11 +7,13 @@ import java.io.IOException;
 public class ChooseCharacterMenu implements KeyListener {	//KeyListener is like ActionListener but for keyboard
 	private int rectX,rectY,rectWidth,rectHeight;
 	private int playerNumber = 1;
-	private Font font = null,fontSmaller=null;
+	private Font font = null,fontSmaller=null, fontMedium=null;
 	private int currentSelection = 0;
 	private final int height = 600;	//Window dimensions
 	private final int width = 900;
 	private Image chooseCharImage  = Toolkit.getDefaultToolkit().createImage("betterSmashChoose.png").getScaledInstance(width, height,java.awt.Image.SCALE_SMOOTH);
+		private String[] characterList = {"Mario", "Donkey Kong",  "Link", "Samus", "Yoshi", "Kirby", "Fox", "Pikachu", "Random"};
+
 	private int[][] imageBoundsX= new int[][] {
 		{97,140,0}, {238,141,0}, {379,141,0}, {521,141,0},{662,141,0}, {167,141,0}, {309,141,0}, {450,141,0}, {591, 143,0}
 	};//Order: Mario, Donkey Kong, Link, Samus, Yoshi, Kirby, Fox, Pikachu, Random
@@ -52,17 +54,14 @@ public class ChooseCharacterMenu implements KeyListener {	//KeyListener is like 
 		try {
 			Font tempfont = Font.createFont(Font.TRUETYPE_FONT, fontFile);
 			font = tempfont.deriveFont((float)(40));
-
-		} catch (FontFormatException e) {
-		} catch (IOException e) {
-		}
-		try {
-			Font tempfont = Font.createFont(Font.TRUETYPE_FONT, fontFile);
 			fontSmaller = tempfont.deriveFont((float)(20));
+			fontMedium = tempfont.deriveFont((float)(25));
+
 
 		} catch (FontFormatException e) {
 		} catch (IOException e) {
 		}
+		
 		frame = new JFrame("Choose Your Character");	//Frame stuff
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(width, height);
@@ -181,8 +180,6 @@ public class ChooseCharacterMenu implements KeyListener {	//KeyListener is like 
 		new ChooseCharacterMenu();
 	}
 
-
-
 	public class canvas extends JPanel {	//Make a new JPanel that you can draw objects onto (Can't draw stuff anywhere you want onto normal JPanels)
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);	//Call paintComponent from the overlord JPanel
@@ -201,11 +198,20 @@ public class ChooseCharacterMenu implements KeyListener {	//KeyListener is like 
 		   // g.drawImage(p2images[8], 468, 319,468,257, null);
 		    if(playerNumber == 1) {
 		    	g.drawImage(p1images[currentSelection], 0, 320,468,257, null);
+		    	g.setFont(fontMedium);
+				FontMetrics mediumMetrics = g.getFontMetrics(fontMedium);
+				int x=210 + (280 - mediumMetrics.stringWidth(characterList[currentSelection])) / 2;
+			    int y = 200 + ((400 - mediumMetrics.getHeight()) / 2) + mediumMetrics.getAscent();
+		    	g.drawString(characterList[currentSelection], x,y);
 			    g.drawImage(p2images[8], 468, 319,468,257, null);
 		    }
 		    else {
+				FontMetrics mediumMetrics = g.getFontMetrics(fontMedium);
+				g.setFont(fontMedium);
 			    g.drawImage(p2images[currentSelection], 468, 319,468,257, null);
-
+			    int x=490 + (600 - mediumMetrics.stringWidth(characterList[currentSelection])) / 2;
+			    int y = 200 + ((400 - mediumMetrics.getHeight()) / 2) + mediumMetrics.getAscent();
+		    	g.drawString(characterList[currentSelection], x,y);
 		    }
 		    //g.drawImage(pickP1Image, 0-9,0-82,null);
 			for(int i = 0; i < imageBoundsX.length; i++) {
@@ -254,4 +260,6 @@ public class ChooseCharacterMenu implements KeyListener {	//KeyListener is like 
 
 		}
 	}
+
+	
 }
