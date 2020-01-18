@@ -13,7 +13,7 @@ public class PhysicsObject extends JPanel {
 	private boolean deadRightNow = false;	//Whether the character is currently dead
 	private long tempTime;	//How long player has been "dead" for, so they can be respawned after a certain duration has passed
 
-	//private boolean onLadder;
+	private double totalDamage;
 	
 	private int objectW;	//Object dimensions
 	private int objectH;
@@ -240,7 +240,10 @@ public class PhysicsObject extends JPanel {
 					"Game Over",
 					JOptionPane.YES_NO_OPTION);
 
-			if(goOrNot == 0) System.exit(0);
+			if(goOrNot == 0) {
+				new EndScreen();
+				//System.exit(0);
+			}
 			else Physics.quit = true;
 
 			System.out.println(goOrNot);
@@ -291,7 +294,7 @@ public class PhysicsObject extends JPanel {
 			fallSpeed = dy;
 			Physics.playSound("jump.wav");
 		}
-		else if(dy > 0 && platform.getPlatHeight() < 25 && hitTime+500<System.currentTimeMillis()) {
+		else if(dy > 0 && platform.getPlatHeight() < 25 && hitTime+400<System.currentTimeMillis()) {
 			lastY += platform.getPlatHeight();
 			falling = true;
 		}
@@ -394,7 +397,10 @@ public class PhysicsObject extends JPanel {
 			
 			if(!melee && attack && fireTime+400<System.currentTimeMillis()) {	//With projectile				
 				Physics.playSound(projectileName);
-				Physics.projectileList.add(new ProjectileWeapon(projectileName, this, lastX-(objectW/2), lastY+(objectH/8), 50, 30, 0.2, 10, orientation));
+				
+				if(orientation>0 && projectileName.equals("arrow")) Physics.projectileList.add(new ProjectileWeapon("arrowFlipped", this, lastX-(objectW/2), lastY+(objectH/8), 50, 30, 0.2, 10, orientation));
+				else Physics.projectileList.add(new ProjectileWeapon(projectileName, this, lastX-(objectW/2), lastY+(objectH/8), 50, 30, 0.2, 10, orientation));
+				
 				fireTime = System.currentTimeMillis();
 			}
 			if(!melee && heavy && fireTime + 300<System.currentTimeMillis()) {
@@ -431,6 +437,7 @@ public class PhysicsObject extends JPanel {
 		if(o.damagePercentage < 90) o.fallSpeed -= (1.5*(o.damagePercentage/3)*damage) / blocking;	//Push object up 
 		else o.fallSpeed -= o.damagePercentage/3*damage / blocking;
 		o.damageTaken += damage / blocking;	//Add to other player's damage percentage
+		o.totalDamage += damageTaken;
 		o.hanging = false;
 
 		if(Math.abs(o.fallSpeed)>4 || Math.abs(o.moveSpeed)>3) o.hitTime = System.currentTimeMillis();
@@ -484,5 +491,13 @@ public class PhysicsObject extends JPanel {
 	
 	public void stopBlocking() {
 		blocking = 1;
+	}
+	
+	public int getNumDeaths() {
+		return numDeath;
+	}
+	
+	public double getTotalDamage() {
+		return totalDamage;
 	}
 }
