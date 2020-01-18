@@ -28,7 +28,8 @@ public class ProjectileWeapon {
 		
 		if(name.equals("fireball")) this.speed = 5;
 		else if(name.equals("laser")) this.speed = 8;
-		else if(name.equals("arrow")) this.speed = 6;
+		else if(name.equals("arrow") || name.equals("arrowFlipped")) this.speed = 6;
+		else if(name.equals("lightning")) this.speed = 7;
 		
 		this.damage = damage; 
 		this.mass = mass;		
