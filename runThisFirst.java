@@ -6,8 +6,8 @@ public class runThisFirst implements KeyListener {	//KeyListener is like ActionL
 	private static final int height = 600;	//Window dimensions
 	private static final int width = 900;
 
-	JFrame frame;	
-	JPanel panel = new JPanel();	
+	static JFrame frame;	
+	static JPanel panel = new JPanel();	
 
 	public runThisFirst() {
 		frame = new JFrame("Menu");	//Frame stuff
