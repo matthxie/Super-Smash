@@ -2,7 +2,6 @@ import javax.imageio.ImageIO;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
-import javax.sound.sampled.FloatControl;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -39,7 +38,7 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 	public static boolean P2IsShooting, P2HeavyAttack, P2Block = false;	//Whether player two is shooting
 
 	public static Image backgroundImage = Toolkit.getDefaultToolkit().createImage("better.jpg").getScaledInstance(width, height,java.awt.Image.SCALE_SMOOTH);
-
+	
 	public static JFrame frame;
 	public static JPanel panel = new Canvas();	//Canvas is a method which creates a panel that you can "draw" objects onto
 
@@ -53,7 +52,7 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 		backgroundImage = currentMap.getBack();
 		
 		panel.setLayout(null);
-
+		
 		physicsObjectMap.put("mario", new PhysicsObject("mario.png", "sword.png", "fireball", false, ThreadLocalRandom.current().nextInt(100, 300 + 1), 100, 40, 50, 33.3, 10));
 		physicsObjectMap.put("donkey", new PhysicsObject("donkey.png", "sword.png", "fireball", true, ThreadLocalRandom.current().nextInt(100, 300 + 1), 100, 50, 60, 33.3, 10));
 		physicsObjectMap.put("link", new PhysicsObject("link.png", "sword.png", "arrow", false, ThreadLocalRandom.current().nextInt(100, 300 + 1), 100, 40, 50, 33.3, 10));
@@ -72,7 +71,7 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 		weaponList.add(physicsObjectList.get(0).getWeapon());
 		weaponList.add(physicsObjectList.get(1).getWeapon());
 		
-		platformList.add(new Platform(400, 92 ,101, 15, false, true));
+		/*platformList.add(new Platform(400, 92 ,101, 15, false, true));
 		platformList.add(new Platform(280, 170 ,102, 15, false, true));
 		platformList.add(new Platform(519, 170 ,102, 15, false, true));
 		platformList.add(new Platform(400, 245 ,101, 15, false, true));
@@ -82,19 +81,31 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 		platformList.add(new Platform(90, 315 ,710, 25, false, true));
 		
 		platformList.add(new Platform(30, 330, 60, 25, true, true));
-		platformList.add(new Platform(800, 330, 60, 25, true, false));
+		platformList.add(new Platform(800, 330, 60, 25, true, false));*/
 		
 		Platform[] tempPlat = currentMap.getPlatformArray();
 		for(Platform p: tempPlat)
 			platformList.add(p);
 
-		try {
+		try {	//Load in all required sprites and images
 			imageMap.put("fireball", ImageIO.read(new File("fireball.png")));
 			imageMap.put("sword", ImageIO.read(new File("sword.png")));
 			imageMap.put("laser", ImageIO.read(new File("laser.png")));
 			imageMap.put("hand", ImageIO.read(new File("hand.png")));
 			imageMap.put("handFlipped", toBufferedImage(flip(ImageIO.read(new File("hand.png")))));
 			imageMap.put("steam", ImageIO.read(new File("steam.png")));
+			
+			imageMap.put("frame1", toBufferedImage(ImageIO.read(new File("frame2.gif")).getScaledInstance(400, 60, Image.SCALE_SMOOTH)));
+			imageMap.put("frame2", toBufferedImage(ImageIO.read(new File("frame3.gif")).getScaledInstance(400, 60, Image.SCALE_SMOOTH)));
+			imageMap.put("frame3", toBufferedImage(ImageIO.read(new File("frame4.gif")).getScaledInstance(400, 60, Image.SCALE_SMOOTH)));	
+			imageMap.put("frame4", toBufferedImage(ImageIO.read(new File("frame5.gif")).getScaledInstance(400, 60, Image.SCALE_SMOOTH)));	
+			imageMap.put("frame5", toBufferedImage(ImageIO.read(new File("frame6.gif")).getScaledInstance(400, 60, Image.SCALE_SMOOTH)));	
+			imageMap.put("frame6", toBufferedImage(ImageIO.read(new File("frame7.gif")).getScaledInstance(400, 60, Image.SCALE_SMOOTH)));	
+			imageMap.put("frame7", toBufferedImage(ImageIO.read(new File("frame8.gif")).getScaledInstance(400, 60, Image.SCALE_SMOOTH)));	
+			imageMap.put("frame8", toBufferedImage(ImageIO.read(new File("frame9.gif")).getScaledInstance(400, 60, Image.SCALE_SMOOTH)));	
+			imageMap.put("frame9", toBufferedImage(ImageIO.read(new File("frame10.gif")).getScaledInstance(400, 60, Image.SCALE_SMOOTH)));	
+			imageMap.put("frame10", toBufferedImage(ImageIO.read(new File("frame11.gif")).getScaledInstance(400, 60, Image.SCALE_SMOOTH)));	
+			imageMap.put("frame11", toBufferedImage(ImageIO.read(new File("frame12.gif")).getScaledInstance(400, 60, Image.SCALE_SMOOTH)));	
 			
 			imageMap.put("yoshi", toBufferedImage(ImageIO.read(new File("yoshi.png")).getScaledInstance(40, 50, Image.SCALE_SMOOTH)));
 			imageMap.put("mario", toBufferedImage(ImageIO.read(new File("mario.png")).getScaledInstance(40, 50, Image.SCALE_SMOOTH)));
@@ -133,7 +144,7 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 					}
 				}
 			}
-		});	
+		});			
 		closeThread.start();
 		animationThread.start();	//Start the main loop
 	}
@@ -233,7 +244,7 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);	//Call paintComponent from the overlord JPanel
 			g.drawImage(backgroundImage, 0, 0, null);
-
+			
 			for(int i=0; i<physicsObjectList.size(); i++) //Draw objects from physicsObjectList
 				physicsObjectList.get(i).draw(g);
 

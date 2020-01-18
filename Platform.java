@@ -3,25 +3,28 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 
 public class Platform { //extends JPanel
-	private int topCornerY, topCornerX;
-	private int longWise, fatWise;
+	private int y, x;
+	private int width, height;
 	private boolean hanging, right;
+	private boolean specialPlat;
 	private PhysicsObject occupant;
 
-	public Platform(int topCornerX, int topCornerY, int longWise, int fatWise, boolean hanging, boolean right) {
-		this.topCornerY = topCornerY;
-		this.topCornerX = topCornerX;
-		this.longWise = longWise;
-		this.fatWise = fatWise;
+	public Platform(int x, int y, int width, int height, boolean hanging, boolean right, boolean special) {
+		this.y = y;
+		this.x = x;
+		this.width = width;
+		this.height = height;
 
 		this.hanging = hanging;
 		this.right = right;
 		
 		this.occupant = null;
+		
+		this.specialPlat = special;
 	}
 
 	public Rectangle getBounds() {
-		return new Rectangle(this.topCornerX, this.topCornerY, this.longWise, 1);
+		return new Rectangle(this.x, this.y, this.width, 1);
 	}
 
 	public boolean getHanging() {
@@ -40,24 +43,28 @@ public class Platform { //extends JPanel
 		return occupant;
 	}
 
-	public int getTopCornerX() {
-		return topCornerX;
+	public int getPlatX() {
+		return x;
 	}
 
-	public int getTopCornerY() {
-		return topCornerY;
+	public int getPlatY() {
+		return y;
 	}
 
-	public int getLength() {
-		return longWise;
+	public int getPlatWidth() {
+		return width;
 	}
 	
-	public int getThickness() {
-		return fatWise;
+	public int getPlatHeight() {
+		return height;
 	}
 
+	public boolean getSpecialPlat() {
+		return specialPlat;
+	}
+	
 	public void draw(Graphics g) {
 		Graphics2D gg = (Graphics2D) g;		
-		gg.fillRect(topCornerX, topCornerY, longWise, fatWise);
+		gg.fillRect(x, y, width, height);
 	}
 }
