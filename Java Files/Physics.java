@@ -27,14 +27,14 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 	public static HashMap<String, Clip> soundMap = new HashMap<String, Clip>();	//Sound clips
 	
 	public static Map currentMap;	//Map from map selection menu
-
+	
 	public static boolean paused = false;
 	public static boolean quit = false;
 
 	public static boolean P1IsShooting, P1HeavyAttack, P1Block = false;	//Whether player one is shooting
 	public static boolean P2IsShooting, P2HeavyAttack, P2Block = false;	//Whether player two is shooting
 
-	public static Image backgroundImage;
+	public static Image backgroundImage = Toolkit.getDefaultToolkit().createImage("better.jpg").getScaledInstance(width, height,java.awt.Image.SCALE_SMOOTH);
 	
 	public static JFrame frame;
 	public static JPanel panel = new Canvas();	//Canvas is a method which creates a panel that you can "draw" objects onto
@@ -49,25 +49,30 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 		backgroundImage = currentMap.getBack();
 		
 		panel.setLayout(null);
-		physicsObjectMap.put("mario", new PhysicsObject("mario.png", "sword.png", "axe.png", "fireball", false, ThreadLocalRandom.current().nextInt(currentMap.getSpawnX(), currentMap.getSpawnXLimit()), 100, 40, 50, 33.3, 10));
-		physicsObjectMap.put("donkey", new PhysicsObject("donkey.png", "sword.png", "axe.png", "fireball", true, ThreadLocalRandom.current().nextInt(currentMap.getSpawnX(), currentMap.getSpawnXLimit()), 100, 40, 50, 33.3, 10));
-		physicsObjectMap.put("link", new PhysicsObject("link.png", "sword.png", "axe.png", "arrow", false, ThreadLocalRandom.current().nextInt(currentMap.getSpawnX(), currentMap.getSpawnXLimit()), 100, 40, 50, 33.3, 10));
-		physicsObjectMap.put("samus", new PhysicsObject("samus.png", "sword.png", "axe.png", "laser", false, ThreadLocalRandom.current().nextInt(currentMap.getSpawnX(), currentMap.getSpawnXLimit()), 100, 40, 50, 33.3, 10));
-		physicsObjectMap.put("yoshi", new PhysicsObject("yoshi.png", "sword.png", "axe.png", "fireball", false, ThreadLocalRandom.current().nextInt(currentMap.getSpawnX(), currentMap.getSpawnXLimit()), 100, 40, 50, 33.3, 10));
-		physicsObjectMap.put("kirby", new PhysicsObject("kirby.png", "sword.png", "axe.png", "fireball", true, ThreadLocalRandom.current().nextInt(currentMap.getSpawnX(), currentMap.getSpawnXLimit()), 100, 40, 50, 33.3, 10));
-		physicsObjectMap.put("fox", new PhysicsObject("fox.png", "sword.png", "axe.png", "laser", false, ThreadLocalRandom.current().nextInt(currentMap.getSpawnX(), currentMap.getSpawnXLimit()), 100, 40, 50, 33.3, 10));
-		physicsObjectMap.put("pikachu", new PhysicsObject("pikachu.png", "sword.png", "axe.png", "fireball", false, ThreadLocalRandom.current().nextInt(currentMap.getSpawnX(), currentMap.getSpawnXLimit()), 100, 40, 45, 33.3, 10));
 		
+		//Store information about all playable characters
+		physicsObjectMap.put("mario", new PhysicsObject("mario.png", "sword.png", "fireball", false, ThreadLocalRandom.current().nextInt(100, 300 + 1), 100, 40, 50, 33.3, 10));
+		physicsObjectMap.put("donkey", new PhysicsObject("donkey.png", "sword.png", "fireball", true, ThreadLocalRandom.current().nextInt(100, 300 + 1), 100, 40, 50, 33.3, 10));
+		physicsObjectMap.put("link", new PhysicsObject("link.png", "sword.png", "arrow", false, ThreadLocalRandom.current().nextInt(100, 300 + 1), 100, 40, 50, 33.3, 10));
+		physicsObjectMap.put("samus", new PhysicsObject("samus.png", "sword.png", "laser", false, ThreadLocalRandom.current().nextInt(100, 300 + 1), 100, 40, 50, 33.3, 10));
+		physicsObjectMap.put("yoshi", new PhysicsObject("yoshi.png", "sword.png", "fireball", false, ThreadLocalRandom.current().nextInt(100, 300 + 1), 100, 40, 50, 33.3, 10));
+		physicsObjectMap.put("kirby", new PhysicsObject("kirby.png", "sword.png", "fireball", true, ThreadLocalRandom.current().nextInt(100, 300 + 1), 100, 40, 50, 33.3, 10));
+		physicsObjectMap.put("fox", new PhysicsObject("fox.png", "sword.png", "laser", false, ThreadLocalRandom.current().nextInt(100, 300 + 1), 100, 40, 50, 33.3, 10));
+		physicsObjectMap.put("pikachu", new PhysicsObject("pikachu.png", "sword.png", "lightning", false, ThreadLocalRandom.current().nextInt(100, 300 + 1), 100, 40, 45, 33.3, 10));
 		
+		//Which two characters are to be used
 		physicsObjectList.add(physicsObjectMap.get(ChooseCharacterMenu.playerOneChar));
 		physicsObjectList.add(physicsObjectMap.get(ChooseCharacterMenu.playerTwoChar));
 		
+		//Set character numbs (1 or 2)
 		physicsObjectList.get(0).setPlayerNumber(1);
 		physicsObjectList.get(1).setPlayerNumber(2);
 		
+		//Add their weapons so they will be rendered
 		weaponList.add(physicsObjectList.get(0).getWeapon());
 		weaponList.add(physicsObjectList.get(1).getWeapon());
-		
+			
+		//The selected map to be played on
 		Platform[] tempPlat = currentMap.getPlatformArray();
 		for(Platform p: tempPlat)
 			platformList.add(p);
@@ -77,7 +82,9 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 			imageMap.put("sword", ImageIO.read(new File("sword.png")));
 			imageMap.put("axe", ImageIO.read(new File("axe.png")));
 			imageMap.put("laser", ImageIO.read(new File("laser.png")));
-			imageMap.put("arrow", ImageIO.read(new File("laser.png")));
+			imageMap.put("arrow", ImageIO.read(new File("arrow.png")));
+			imageMap.put("arrowFlipped", toBufferedImage(flip(ImageIO.read(new File("arrow.png")))));
+			imageMap.put("lightning", ImageIO.read(new File("thunderbolt.png")));
 			imageMap.put("hand", ImageIO.read(new File("hand.png")));
 			imageMap.put("handFlipped", toBufferedImage(flip(ImageIO.read(new File("hand.png")))));
 			
@@ -115,7 +122,7 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 					
 				}
 				frame.dispose();
-				new mainMenu();
+				new MainMenu();
 			}
 		});
 		Thread animationThread = new Thread(new Runnable() {	//The main loop
@@ -238,9 +245,6 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 			super.paintComponent(g);	//Call paintComponent from the overlord JPanel
 			g.drawImage(backgroundImage, 0, 0, null);
 			
-			//for(int i=0; i<platformList.size(); i++)
-			//	platformList.get(i).draw(g);
-			
 			for(int i=0; i<physicsObjectList.size(); i++) //Draw objects from physicsObjectList
 				physicsObjectList.get(i).draw(g);
 
@@ -264,4 +268,7 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 		}
 	}
 
+	public static void main(String[] args) {	//Call the graphics constructor
+		new Physics();
+	}
 }

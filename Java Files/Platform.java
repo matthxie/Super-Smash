@@ -6,7 +6,7 @@ public class Platform { //extends JPanel
 	private int y, x;
 	private int width, height;
 	private boolean hanging, right;
-	private boolean specialPlat;
+	boolean specialPlat;
 	private PhysicsObject occupant;
 
 	public Platform(int x, int y, int width, int height, boolean hanging, boolean right, boolean special) {

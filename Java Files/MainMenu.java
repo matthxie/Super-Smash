@@ -3,35 +3,31 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-
-public class HowToPlayMenu implements KeyListener {	//KeyListener is like ActionListener but for keyboard
+public class MainMenu implements KeyListener {	//KeyListener is like ActionListener but for keyboard
 	private int rectX,rectY,rectWidth,rectHeight;
 	private int currentSelection = 0;
-	
-	private String currentScreen = "movement";
-	
 	private final int height = 600;	//Window dimensions
 	private final int width = 900;
-
-	private int[][] buttonBoundsX = {
-			{48, 175},
-			{668, 175}
-
+	private int[][] wordBoundsX= new int[][] {
+		{610-5,200+10}, {500-5,395+9}, {560-5,300+10}
 	};
-	private int[][] buttonBoundsY = {
-			{488, 69},
-			{488, 69}
+	
+	private int[][] wordBoundsY = new int[][] { //Order: SMASH, How to play, settings
+		{240-5, 40+10},{340-5,40+10},{440-5,40+10}
 	};
-
 	private boolean closed = false;
-	private Image backgroundImg  = Toolkit.getDefaultToolkit().createImage("MOVEMENTCONTROLS.png").getScaledInstance(width, height,java.awt.Image.SCALE_SMOOTH);
+	private Image backgroundImg  = Toolkit.getDefaultToolkit().createImage("betterIntroScreen.jpg").getScaledInstance(width, height,java.awt.Image.SCALE_SMOOTH);
+	private Image smashImg  = Toolkit.getDefaultToolkit().createImage("SMASH.png").getScaledInstance(200, 40,java.awt.Image.SCALE_SMOOTH);
+	private Image howToPlayImg  = Toolkit.getDefaultToolkit().createImage("HOWTOPLAY.png").getScaledInstance(395, 40,java.awt.Image.SCALE_SMOOTH);
+	private Image settingsImg  = Toolkit.getDefaultToolkit().createImage("SETTINGS.png").getScaledInstance(300, 40,java.awt.Image.SCALE_SMOOTH);
 
 	private JFrame frame;	
 	private JPanel panel = new canvas();	
 
-	public HowToPlayMenu() {
-
+	public MainMenu() {
+		
 		setDrawnSelection();
+
 		frame = new JFrame("Super Smash");	//Frame stuff
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(width, height);
@@ -44,10 +40,8 @@ public class HowToPlayMenu implements KeyListener {	//KeyListener is like Action
 
 		frame.setLocationRelativeTo(null);	//Make the frame visible
 		frame.setVisible(true);	
-		
 		Thread updateMenu = new Thread(new Runnable() {	//The main loop
 			public void run() {	
-
 				while (!closed) {	
 					frame.repaint();	//Refresh frame and panel
 					panel.repaint();
@@ -60,53 +54,51 @@ public class HowToPlayMenu implements KeyListener {	//KeyListener is like Action
 
 	}
 	private void setDrawnSelection() {
-		rectX = buttonBoundsX[currentSelection][0];
-		rectY = buttonBoundsY[currentSelection][0];
-		rectWidth = buttonBoundsX[currentSelection][1];
-		rectHeight = buttonBoundsY[currentSelection][1];
+		rectX = wordBoundsX[currentSelection][0];
+		rectY = wordBoundsY[currentSelection][0];
+		rectWidth = wordBoundsX[currentSelection][1];
+		rectHeight = wordBoundsY[currentSelection][1];
 	}
 
 	public void keyTyped(KeyEvent e) {}
 
 	public void keyPressed(KeyEvent e) {
-		if(e.getKeyCode() == KeyEvent.VK_LEFT && currentSelection >0) {
-			currentSelection--;
-			setDrawnSelection();
-		}
-		else if(e.getKeyCode() == KeyEvent.VK_RIGHT && currentSelection < 1) {
+		if(e.getKeyCode() == KeyEvent.VK_DOWN && currentSelection < 2) {
+			Physics.playSound("menuLeft");
+			
 			currentSelection++;
 			setDrawnSelection();
 		}
+		else if(e.getKeyCode() == KeyEvent.VK_UP&&currentSelection > 0) {
+			Physics.playSound("menuRight");
+			
+			currentSelection--;
+			setDrawnSelection();
+		}
 		else if(e.getKeyCode() == KeyEvent.VK_ENTER) {
-			if(currentSelection==0) {
-				closed = true;
-				new MainMenu();
-			}
-			else if(currentSelection==1) {
-				if(currentScreen.equals("attack")) {
-					new MainMenu();
-					frame.dispose();
-				}
-				
-				if(currentScreen.equals("movement")) currentScreen = "attack";
-				backgroundImg = Toolkit.getDefaultToolkit().createImage("AttackControls.png").getScaledInstance(width, height,java.awt.Image.SCALE_SMOOTH);
-			}
-			//System.out.println("Houston we have a problem with the selection");
+			Physics.playSound("menuSelect");
+			
+			closed = true;
+			if(currentSelection==0)new ChooseCharacterMenu();
+			else if(currentSelection==1) new HowToPlayMenu();
+			else if(currentSelection==2) new Settings();
 		}
 	}
-
+	
 	public void keyReleased(KeyEvent e) {}
 
 	public static void main(String[] args) {	//Call the graphics constructor
-		new HowToPlayMenu();
+		new MainMenu();
 	}
 
 	public class canvas extends JPanel {	//Make a new JPanel that you can draw objects onto (Can't draw stuff anywhere you want onto normal JPanels)
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);	//Call paintComponent from the overlord JPanel
 			g.setColor(new Color(200, 0,0));
-			g.drawImage(backgroundImg, 0, 0, null);
-
+			g.drawImage(backgroundImg,0,0, null);
+			g.drawImage(smashImg, 610, 240, null);
+			g.drawImage(howToPlayImg, 500, 340, null);
+			g.drawImage(settingsImg, 560, 440, null);
 			g.drawRect(rectX, rectY, rectWidth, rectHeight);
 			g.drawRect(rectX+1, rectY+1, rectWidth-2, rectHeight-2);
 			g.drawRect(rectX-1, rectY-1, rectWidth+2, rectHeight+2);

@@ -8,6 +8,7 @@ public class Map{ //extends JPanel
 	private int difficulty;
 	private String title;
 	private int spawnX, spawnXLimit;
+	
 	public String getTitle() {
 		return title;
 	}
@@ -31,14 +32,17 @@ public class Map{ //extends JPanel
 		backgroundImage = img;
 		platformArray = platArr;
 		difficulty = diff;
+		
 		this.title = title;
 		this.spawnX = platArr[0].getPlatX();
 		this.spawnXLimit = platArr[0].getPlatWidth()+this.spawnX;
 		
-		
 	}
-	
+	public void drawDiff(Graphics g, int x, int y) {
+		Graphics2D gg = (Graphics2D) g;
+	}
 	public void draw(Graphics g, int x, int y, int width, int height) {
+		Graphics2D gg = (Graphics2D) g;		
 		g.drawImage(backgroundImage, x, y, width, height, null);
 	}
 	
