@@ -1,43 +1,40 @@
 import javax.swing.*;
-
 import java.awt.*;
 import java.awt.event.*;
-import java.util.Arrays;
+import java.util.Collections;
 
-
-public class Settings implements KeyListener {	//KeyListener is like ActionListener but for keyboard
+public class MapSettings implements KeyListener {	//KeyListener is like ActionListener but for keyboard
 	private int rectX,rectY,rectWidth,rectHeight;
 	private int currentSelection = 0;
+	
+	private boolean difficultySelected;
+	
 	private final int height = 600;	//Window dimensions
 	private final int width = 900;
-
-	public static int music = 0, currentChoiceEffects=2;
-
+	
+	
 	private int[][] buttonBoundsX = {
-
-			{288, 136},
-			{450, 136},
-			{287, 136},
-			{452, 136},
-			{348, 175},
-
+			{238, 175}, 
+			{512, 175},
+			{238, 175}, 
+			{511, 175}, 
+			{373, 175}
 	};
 	private int[][] buttonBoundsY = {
-
-			{215, 65},
-			{215, 65},
-			{379, 65},
-			{379, 65},
-			{489, 69},
+			{190, 69},
+			{191, 69},
+			{380, 69},
+			{379, 69},
+			{492, 69},
 	};
 
 	private boolean closed = false;
-	private Image backgroundImg  = Toolkit.getDefaultToolkit().createImage("SettingsMenuImage.png").getScaledInstance(width, height,java.awt.Image.SCALE_SMOOTH);
+	private Image backgroundImg  = Toolkit.getDefaultToolkit().createImage("mapSettings.png").getScaledInstance(width, height,java.awt.Image.SCALE_SMOOTH);
 
 	private JFrame frame;	
 	private JPanel panel = new canvas();	
 
-	public Settings() {
+	public MapSettings() {
 
 		setDrawnSelection();
 		frame = new JFrame("Settings");	//Frame stuff
@@ -71,49 +68,50 @@ public class Settings implements KeyListener {	//KeyListener is like ActionListe
 		rectY = buttonBoundsY[currentSelection][0];
 		rectWidth = buttonBoundsX[currentSelection][1];
 		rectHeight = buttonBoundsY[currentSelection][1];
-
 	}
+	
 	public void keyTyped(KeyEvent e) {}
 
-	public void keyPressed(KeyEvent e) {		
-		if(e.getKeyCode() == KeyEvent.VK_LEFT && currentSelection >0) {
+	public void keyPressed(KeyEvent e) {
+		if(e.getKeyCode() == KeyEvent.VK_LEFT && currentSelection > 0) {
 			currentSelection--;
 			setDrawnSelection();
 		}
-		else if(e.getKeyCode() == KeyEvent.VK_RIGHT && currentSelection < 4) {
+		else if(e.getKeyCode() == KeyEvent.VK_RIGHT&&currentSelection < 4) {
 			currentSelection++;
 			setDrawnSelection();
 		}
 		else if(e.getKeyCode() == KeyEvent.VK_ENTER) {
-			if(currentSelection==4) {
-				new MainMenu();
+			if(currentSelection == 0) difficultySelected = true;
+			if(currentSelection == 1) difficultySelected = false;
+			
+			if(currentSelection == 2 && difficultySelected) Collections.sort(ChooseMapMenu.allMapArray, new SortByDecreasingDiff());
+			if(currentSelection == 2 && !difficultySelected) Collections.sort(ChooseMapMenu.allMapArray, new SortByDecreasingTitle());
+			
+			if(currentSelection == 3 && difficultySelected) Collections.sort(ChooseMapMenu.allMapArray, new SortByIncreasingDifficulty());
+			if(currentSelection == 3 && !difficultySelected) Collections.sort(ChooseMapMenu.allMapArray, new SortByIncreasingTitle());
+			
+			if(currentSelection == 4) {
 				frame.dispose();
-			}	
-			else if(currentSelection <= 1) {
-				music = currentSelection;
+				new ChooseMapMenu();
+				closed = true;
 			}
-			else if(currentSelection > 1) {
-				currentChoiceEffects = currentSelection;
-			}
+			
 		}
 	}
 
 	public void keyReleased(KeyEvent e) {}
 
+	public static void main(String[] args) {	//Call the graphics constructor
+		new MapSettings();
+	}
+
 	public class canvas extends JPanel {	//Make a new JPanel that you can draw objects onto (Can't draw stuff anywhere you want onto normal JPanels)
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);	//Call paintComponent from the overlord JPanel
-			g.setColor(new Color(200, 0,0));
-			g.drawImage(backgroundImg, 0, 0, null);
-			g.setColor(new Color(0,0,255));
-
-			g.drawRect(buttonBoundsX[music][0], buttonBoundsY[music][0], buttonBoundsX[music][1], buttonBoundsY[music][1]);
-			g.drawRect(buttonBoundsX[music][0]+1, buttonBoundsY[music][0]+1, buttonBoundsX[music][1]-2, buttonBoundsY[music][1]-2);
-			g.drawRect(buttonBoundsX[music][0]-1, buttonBoundsY[music][0]-1, buttonBoundsX[music][1]+2, buttonBoundsY[music][1]+2);
-
-			g.drawRect(buttonBoundsX[currentChoiceEffects][0], buttonBoundsY[currentChoiceEffects][0], buttonBoundsX[currentChoiceEffects][1], buttonBoundsY[currentChoiceEffects][1]);
-			g.drawRect(buttonBoundsX[currentChoiceEffects][0]+1, buttonBoundsY[currentChoiceEffects][0]+1, buttonBoundsX[currentChoiceEffects][1]-2, buttonBoundsY[currentChoiceEffects][1]-2);
-			g.drawRect(buttonBoundsX[currentChoiceEffects][0]-1, buttonBoundsY[currentChoiceEffects][0]-1, buttonBoundsX[currentChoiceEffects][1]+2, buttonBoundsY[currentChoiceEffects][1]+2);
+			g.setColor(new Color(34, 33,34));
+			g.fillRect(0, 0, width, height);
+			g.drawImage(backgroundImg,0-10,0, null);
 			g.setColor(new Color(255,0,0));
 			g.drawRect(rectX, rectY, rectWidth, rectHeight);
 			g.drawRect(rectX+1, rectY+1, rectWidth-2, rectHeight-2);
