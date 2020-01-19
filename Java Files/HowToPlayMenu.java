@@ -91,7 +91,6 @@ public class HowToPlayMenu implements KeyListener {	//KeyListener is like Action
 				if(currentScreen.equals("movement")) currentScreen = "attack";
 				backgroundImg = Toolkit.getDefaultToolkit().createImage("AttackControls.png").getScaledInstance(width, height,java.awt.Image.SCALE_SMOOTH);
 			}
-			//System.out.println("Houston we have a problem with the selection");
 		}
 	}
 

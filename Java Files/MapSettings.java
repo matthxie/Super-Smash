@@ -1,10 +1,14 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.Collections;
 
 public class MapSettings implements KeyListener {	//KeyListener is like ActionListener but for keyboard
 	private int rectX,rectY,rectWidth,rectHeight;
 	private int currentSelection = 0;
+	
+	private boolean difficultySelected;
+	
 	private final int height = 600;	//Window dimensions
 	private final int width = 900;
 	
@@ -78,11 +82,19 @@ public class MapSettings implements KeyListener {	//KeyListener is like ActionLi
 			setDrawnSelection();
 		}
 		else if(e.getKeyCode() == KeyEvent.VK_ENTER) {
-			if(currentSelection==4) {
+			if(currentSelection == 0) difficultySelected = true;
+			if(currentSelection == 1) difficultySelected = false;
+			
+			if(currentSelection == 2 && difficultySelected) Collections.sort(ChooseMapMenu.allMapArray, new SortByDecreasingDiff());
+			if(currentSelection == 2 && !difficultySelected) Collections.sort(ChooseMapMenu.allMapArray, new SortByDecreasingTitle());
+			
+			if(currentSelection == 3 && difficultySelected) Collections.sort(ChooseMapMenu.allMapArray, new SortByIncreasingDifficulty());
+			if(currentSelection == 3 && !difficultySelected) Collections.sort(ChooseMapMenu.allMapArray, new SortByIncreasingTitle());
+			
+			if(currentSelection == 4) {
 				frame.dispose();
 				new ChooseMapMenu();
 				closed = true;
-				;
 			}
 			
 		}

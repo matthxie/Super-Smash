@@ -96,7 +96,6 @@ public class Settings implements KeyListener {	//KeyListener is like ActionListe
 			else if(currentSelection> 1) {
 				currentChoiceEffects = currentSelection;
 			}
-
 		}
 	}
 
