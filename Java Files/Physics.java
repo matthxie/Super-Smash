@@ -235,8 +235,10 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 			soundMap.put(name, AudioSystem.getClip());
 			soundMap.get(name).open(audioInputStream);
 			
-			if(name.equalsIgnoreCase("main theme") && Settings.currentChoiceMusic == 0) soundMap.get(name).loop(Clip.LOOP_CONTINUOUSLY);
-			else if(Settings.currentChoiceEffects==2) soundMap.get(name).start();
+			if(name.equalsIgnoreCase("main theme") && Settings.music == 0) soundMap.get(name).loop(Clip.LOOP_CONTINUOUSLY);
+			if(name.equalsIgnoreCase("main theme") && Settings.music != 0) if(Physics.soundMap.get("main theme") != null) Physics.soundMap.get("main theme").stop();
+			
+			if(Settings.currentChoiceEffects==2 && !name.equalsIgnoreCase("main theme")) soundMap.get(name).start();
 		} catch(Exception ex) {}
 	}
 	

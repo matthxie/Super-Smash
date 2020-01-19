@@ -51,7 +51,10 @@ public class MainMenu implements KeyListener {	//KeyListener is like ActionListe
 			}
 		});	
 		updateMenu.start();	//Start the main loop
-
+		
+		if(Physics.soundMap.get("main theme") != null) Physics.soundMap.get("main theme").stop();
+		Physics.soundMap.clear();
+		Physics.playSound("main theme");
 	}
 	private void setDrawnSelection() {
 		rectX = wordBoundsX[currentSelection][0];

@@ -26,8 +26,6 @@ public class RunThisFirst implements KeyListener {	//KeyListener is like ActionL
 
 		frame.setLocationRelativeTo(null);	//Make the frame visible
 		frame.setVisible(true);
-		
-		Physics.playSound("main theme");
 	}
 
 	public void keyTyped(KeyEvent e) {}	//KeyListener is an interface so must implement all empty methods, this one is just useless

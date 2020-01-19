@@ -79,7 +79,8 @@ public class ChooseMapMenu implements KeyListener {	//KeyListener is like Action
 				}
 
 				new Physics();
-				Physics.soundMap.get("main theme").stop();
+				
+				if(Physics.soundMap.get("main theme") != null) Physics.soundMap.get("main theme").stop();
 				Physics.soundMap.clear();
 				Physics.playSound("gong");
 

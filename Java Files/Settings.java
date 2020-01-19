@@ -10,8 +10,8 @@ public class Settings implements KeyListener {	//KeyListener is like ActionListe
 	private int currentSelection = 0;
 	private final int height = 600;	//Window dimensions
 	private final int width = 900;
-	private int pageNumber = 1;
-	public static int currentChoiceMusic = 0, currentChoiceEffects=2, prevChoiceMusic = 0;
+
+	public static int music = 0, currentChoiceEffects=2;
 
 	private int[][] buttonBoundsX = {
 
@@ -75,12 +75,12 @@ public class Settings implements KeyListener {	//KeyListener is like ActionListe
 	}
 	public void keyTyped(KeyEvent e) {}
 
-	public void keyPressed(KeyEvent e) {
+	public void keyPressed(KeyEvent e) {		
 		if(e.getKeyCode() == KeyEvent.VK_LEFT && currentSelection >0) {
 			currentSelection--;
 			setDrawnSelection();
 		}
-		else if(e.getKeyCode() == KeyEvent.VK_RIGHT&&currentSelection < 4) {
+		else if(e.getKeyCode() == KeyEvent.VK_RIGHT && currentSelection < 4) {
 			currentSelection++;
 			setDrawnSelection();
 		}
@@ -90,10 +90,9 @@ public class Settings implements KeyListener {	//KeyListener is like ActionListe
 				frame.dispose();
 			}	
 			else if(currentSelection <= 1) {
-				prevChoiceMusic = currentChoiceMusic;
-				currentChoiceMusic = currentSelection;
+				music = currentSelection;
 			}
-			else if(currentSelection> 1) {
+			else if(currentSelection > 1) {
 				currentChoiceEffects = currentSelection;
 			}
 		}
@@ -108,9 +107,9 @@ public class Settings implements KeyListener {	//KeyListener is like ActionListe
 			g.drawImage(backgroundImg, 0, 0, null);
 			g.setColor(new Color(0,0,255));
 
-			g.drawRect(buttonBoundsX[currentChoiceMusic][0], buttonBoundsY[currentChoiceMusic][0], buttonBoundsX[currentChoiceMusic][1], buttonBoundsY[currentChoiceMusic][1]);
-			g.drawRect(buttonBoundsX[currentChoiceMusic][0]+1, buttonBoundsY[currentChoiceMusic][0]+1, buttonBoundsX[currentChoiceMusic][1]-2, buttonBoundsY[currentChoiceMusic][1]-2);
-			g.drawRect(buttonBoundsX[currentChoiceMusic][0]-1, buttonBoundsY[currentChoiceMusic][0]-1, buttonBoundsX[currentChoiceMusic][1]+2, buttonBoundsY[currentChoiceMusic][1]+2);
+			g.drawRect(buttonBoundsX[music][0], buttonBoundsY[music][0], buttonBoundsX[music][1], buttonBoundsY[music][1]);
+			g.drawRect(buttonBoundsX[music][0]+1, buttonBoundsY[music][0]+1, buttonBoundsX[music][1]-2, buttonBoundsY[music][1]-2);
+			g.drawRect(buttonBoundsX[music][0]-1, buttonBoundsY[music][0]-1, buttonBoundsX[music][1]+2, buttonBoundsY[music][1]+2);
 
 			g.drawRect(buttonBoundsX[currentChoiceEffects][0], buttonBoundsY[currentChoiceEffects][0], buttonBoundsX[currentChoiceEffects][1], buttonBoundsY[currentChoiceEffects][1]);
 			g.drawRect(buttonBoundsX[currentChoiceEffects][0]+1, buttonBoundsY[currentChoiceEffects][0]+1, buttonBoundsX[currentChoiceEffects][1]-2, buttonBoundsY[currentChoiceEffects][1]-2);
