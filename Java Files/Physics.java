@@ -81,6 +81,8 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 			imageMap.put("fireball", ImageIO.read(new File("fireball.png")));
 			imageMap.put("sword", ImageIO.read(new File("sword.png")));
 			imageMap.put("axe", ImageIO.read(new File("axe.png")));
+			imageMap.put("shield", ImageIO.read(new File("shield.png")));
+			imageMap.put("shieldFlipped", toBufferedImage(flip(ImageIO.read(new File("shield.png")))));
 			imageMap.put("laser", ImageIO.read(new File("laser.png")));
 			imageMap.put("arrow", ImageIO.read(new File("arrow.png")));
 			imageMap.put("arrowFlipped", toBufferedImage(flip(ImageIO.read(new File("arrow.png")))));
@@ -129,8 +131,8 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 			public void run() {
 				while(!quit) {
 					while (!paused) {
-						if(P1IsShooting || P1HeavyAttack) physicsObjectList.get(0).swingWeapon(P1Block, P1IsShooting, P1HeavyAttack);
-						if(P2IsShooting || P2HeavyAttack) physicsObjectList.get(1).swingWeapon(P2Block, P2IsShooting, P2HeavyAttack);
+						if(P1IsShooting || P1HeavyAttack) physicsObjectList.get(0).swingWeapon(P1IsShooting, P1HeavyAttack);
+						if(P2IsShooting || P2HeavyAttack) physicsObjectList.get(1).swingWeapon(P2IsShooting, P2HeavyAttack);
 
 						frame.repaint();	//Refresh frame and panel
 						panel.repaint();
@@ -189,11 +191,11 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 
 		if(e.getKeyCode() == KeyEvent.VK_PERIOD && !P1HeavyAttack && !P1Block)	P1IsShooting = true;	//Attack keys for player 1
 		if(e.getKeyCode() == KeyEvent.VK_SLASH && !P1IsShooting && !P1Block) P1HeavyAttack = true;
-		if(e.getKeyCode() == KeyEvent.VK_COMMA && !P1HeavyAttack && !P1HeavyAttack) P1Block = true;
+		if(e.getKeyCode() == KeyEvent.VK_COMMA && !P1HeavyAttack && !P1HeavyAttack) physicsObjectList.get(0).startBlocking();
 
 		//WASD for object2
 		if(e.getKeyCode() == KeyEvent.VK_D) physicsObjectList.get(1).moveX(4);	//"VK_*LETTER*" --> "D" key
-		if(e.getKeyCode() == KeyEvent.VK_A) physicsObjectList.get(1).moveX(-4);	//physicsObjectList.get(1): gets second obejct (the only two are the boxes)
+		if(e.getKeyCode() == KeyEvent.VK_A) physicsObjectList.get(1).moveX(-4);	//physicsObjectList.get(1): gets second object (the only two are the boxes)
 
 		if(e.getKeyCode() == KeyEvent.VK_W) {
 			if(physicsObjectList.get(1).getNumJumps()<=1) physicsObjectList.get(1).moveY(-10);
@@ -204,7 +206,7 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 
 		if(e.getKeyCode() == KeyEvent.VK_X && !P2HeavyAttack && !P2Block)	P2IsShooting = true;	//Attack keys for player 2
 		if(e.getKeyCode() == KeyEvent.VK_C && !P2IsShooting && !P2Block) P2HeavyAttack = true;
-		if(e.getKeyCode() == KeyEvent.VK_Z && !P2HeavyAttack && !P2HeavyAttack) P2Block = true;
+		if(e.getKeyCode() == KeyEvent.VK_Z && !P2HeavyAttack && !P2HeavyAttack) physicsObjectList.get(1).startBlocking();
 	}
 
 	public void keyReleased(KeyEvent e) {	//When the keys are released
@@ -218,6 +220,7 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 			P1Block = false;
 			physicsObjectList.get(0).stopBlocking();
 		}
+		
 		if(e.getKeyCode() == KeyEvent.VK_PERIOD) P1IsShooting = false;
 		if(e.getKeyCode() == KeyEvent.VK_SLASH) P1HeavyAttack = false;
 		
@@ -225,6 +228,7 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 			P2Block = false;
 			physicsObjectList.get(1).stopBlocking();
 		}
+		
 		if(e.getKeyCode() == KeyEvent.VK_X) P2IsShooting = false;
 		if(e.getKeyCode() == KeyEvent.VK_C) P2HeavyAttack = false;
 	}
@@ -264,7 +268,7 @@ public class Physics implements KeyListener {	//KeyListener is like ActionListen
 					}
 				}
 			}
-
+			
 			for(int j=0; j<weaponList.size(); j++)	//Draw objects in weaponList
 				weaponList.get(j).draw(g);
 		}
